@@ -1,3 +1,4 @@
+@use "sass:meta";
 /*
  * App Global CSS
  * ----------------------------------------------------------------------------
@@ -36,4 +37,4 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 // @import "@ionic/angular/css/palettes/dark.system.css";
 
-@import "theme/styles.scss";
+@include meta.load-css("theme/styles.scss");

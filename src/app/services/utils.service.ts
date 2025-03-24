@@ -13,7 +13,10 @@ export class UtilsService {
 
   //Loading
   loading(){
-    return this.loadingCtrl.create({spinner: 'crescent'});
+    return this.loadingCtrl.create({
+      spinner: 'crescent',
+      cssClass: 'custom-load'
+    });
   }
 
   //Toast

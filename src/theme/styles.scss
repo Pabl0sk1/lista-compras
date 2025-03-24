@@ -110,3 +110,7 @@ ion-button {
   color: var(--ion-color-success-shade);
   text-decoration: underline;
 }
+
+.custom-load {
+  --spinner-color: rgb(26, 225, 70);
+}
