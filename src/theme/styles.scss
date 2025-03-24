@@ -114,3 +114,33 @@ ion-button {
 .custom-load {
   --spinner-color: rgb(26, 225, 70);
 }
+
+.custom-alert {
+  --backdrop-opacity: 0.7;
+
+  .alert-wrapper {
+    border-radius: 8px;
+  }
+
+  .alert-title {
+    font-size: 20px;
+  }
+
+  .alert-message {
+    color: #4c4c4c;
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  .cancel-button {
+    color: rgb(223, 27, 27);
+    background: #cecece;
+    font-weight: bolder;
+  }
+
+  .logout-button {
+    color: rgb(21, 171, 53);
+    background: #cecece;
+    font-weight: bolder;
+  }
+}

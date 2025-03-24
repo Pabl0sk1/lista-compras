@@ -1,7 +1,13 @@
 <app-header title="Perfil"></app-header>
 <ion-content>
-  <ion-button color="dark" (click)="signOut()">
-    Salir
-    <ion-icon slot="end" name="return-up-forward-outline"></ion-icon>
-  </ion-button>
+  <div class="ion-text-center">
+    <ion-icon class="avatar" name="person-circle-outline"></ion-icon>
+    <h2>{{user.name}}</h2>
+    <div class="email">{{user.email}}</div>
+
+    <ion-button color="dark" (click)="signOut()" shape="round">
+      Salir
+      <ion-icon slot="end" name="return-up-forward-outline"></ion-icon>
+    </ion-button>
+  </div>
 </ion-content>

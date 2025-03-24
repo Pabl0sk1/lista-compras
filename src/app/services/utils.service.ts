@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoadingController, ToastController, ToastOptions } from '@ionic/angular';
+import { AlertController, AlertOptions, LoadingController, ToastController, ToastOptions } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +10,10 @@ export class UtilsService {
   loadingCtrl = inject(LoadingController);
   toastCtrl = inject(ToastController);
   router = inject(Router);
+  alertCtrl = inject(AlertController);
 
   //Loading
-  loading(){
+  loading() {
     return this.loadingCtrl.create({
       spinner: 'crescent',
       cssClass: 'custom-load'
@@ -25,15 +26,21 @@ export class UtilsService {
     toast.present();
   }
 
-  routerLink(url: string){
+  routerLink(url: string) {
     return this.router.navigateByUrl(url);
   }
 
-  saveInLocalStorage(key: string, value: any){
+  saveInLocalStorage(key: string, value: any) {
     return localStorage.setItem(key, JSON.stringify(value));
   }
 
-  getFromLocalStorage(key: string){
+  getFromLocalStorage(key: string) {
     return JSON.parse(localStorage.getItem(key));
+  }
+
+  //Alerta
+  async presentAlert(opts: AlertOptions) {
+    const alert = await this.alertCtrl.create(opts);
+    await alert.present();
   }
 }
