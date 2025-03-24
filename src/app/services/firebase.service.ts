@@ -60,6 +60,7 @@ export class FirebaseService {
   //Mensajes a español
   translateErrorMessage(errorCode: string): string {
     const errorMessages: { [key: string]: string } = {
+      'auth/invalid-credential': 'El correo o la contraseña son incorrectos.',
       'auth/user-not-found': 'No se encontró una cuenta con este correo.',
       'auth/wrong-password': 'La contraseña es incorrecta.',
       'auth/invalid-email': 'El correo proporcionado no es válido.',

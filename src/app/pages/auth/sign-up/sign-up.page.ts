@@ -16,13 +16,36 @@ export class SignUpPage implements OnInit {
     uid: new FormControl(''),
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required]),
+    confirmPassword: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required, Validators.minLength(4)])
-  })
+  }, { validators: this.confirmPasswordValidator });
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
 
   ngOnInit() {
+  }
+
+  confirmPasswordValidator(group: FormGroup){
+    const password = group.get('password');
+    const confirmPassword = group.get('confirmPassword');
+
+    if (!password || !confirmPassword) return null;
+
+    // Si confirmPassword está vacío, solo muestra el error "required"
+    if (!confirmPassword.value) {
+      confirmPassword.setErrors({ required: true });
+      return null;
+    }
+
+    // Si confirmPassword tiene algún valor pero no coincide con password
+    if (password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+    } else {
+      confirmPassword.setErrors(null);
+    }
+
+    return null;
   }
 
   async submit(){
@@ -63,6 +86,7 @@ export class SignUpPage implements OnInit {
 
       let path = `users/${uid}`;
       delete this.form.value.password;
+      delete this.form.value.confirmPassword;
 
       this.firebaseSvc.setDocument(path, this.form.value).then(async res =>{
         this.utilsSvc.saveInLocalStorage('user', this.form.value);

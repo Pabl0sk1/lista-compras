@@ -25,6 +25,14 @@
         <div *ngIf="form.controls.password.errors?.['required']">La contraseña es obligatoria.</div>
       </div>
 
+      <app-custom-input icon="checkmark-circle-outline" [control]="form.controls.confirmPassword" type="password"
+        label="Confirmar Contraseña"></app-custom-input>
+      <div class="validators" *ngIf="form.controls.confirmPassword.errors && form.controls.confirmPassword.touched">
+        <div *ngIf="form.controls.confirmPassword.errors?.['required']">La confirmación de la contraseña es obligatoria.
+        </div>
+        <div *ngIf="form.controls.confirmPassword.errors?.['passwordMismatch']">Las contraseñas no coinciden.</div>
+      </div>
+
       <ion-button color="dark" expand="block" mode="ios" class="submit" type="submit" [disabled]="form.invalid">
         Registrarse
         <ion-icon slot="end" name="person-add-outline"></ion-icon>
