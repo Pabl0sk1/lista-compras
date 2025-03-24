@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
@@ -12,7 +11,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 })
 export class ForgotPasswordPage implements OnInit {
 
-form = new FormGroup({
+  form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email])
   })
 
@@ -28,11 +27,11 @@ form = new FormGroup({
       const loading = await this.utilsSvc.loading();
       await loading.present();
 
-      this.firebaseSvc.sendRecoveryEmail(this.form.value.email).then(res =>{
+      this.firebaseSvc.sendRecoveryEmail(this.form.value.email).then(() =>{
         this.utilsSvc.presentToast({
-          message: `Correo enviado con éxito`,
+          message: `Correo enviado con éxito.`,
           duration: 1500,
-          color: 'primary',
+          color: 'success',
           position: 'middle',
           icon: 'mail-outline'
         });
@@ -43,10 +42,11 @@ form = new FormGroup({
       }).catch(error => {
 
         console.log(error);
+        const mensaje = this.firebaseSvc.translateErrorMessage(error.code);
         this.utilsSvc.presentToast({
-          message: error.message,
+          message: mensaje,
           duration: 2500,
-          color: 'primary',
+          color: 'danger',
           position: 'middle',
           icon: 'alert-circle-outline'
         })

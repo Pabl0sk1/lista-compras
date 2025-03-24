@@ -29,7 +29,7 @@ ion-button {
 }
 
 .custom-input {
-  --border-color: #e0e0e0;
+  --border-color: #aeaeae;
   --border-radius: 15px;
   --border-style: solid;
   --border-width: 1px;
@@ -103,10 +103,10 @@ ion-button {
 
 .forgot-password {
   cursor: pointer;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
+  transition: color 0.01s ease, text-decoration 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: var(--ion-color-primary-shade);
+  color: var(--ion-color-success-shade);
   text-decoration: underline;
 }

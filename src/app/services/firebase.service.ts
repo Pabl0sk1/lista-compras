@@ -56,4 +56,19 @@ export class FirebaseService {
   async getDocument(path: string){
     return (await getDoc(doc(getFirestore(), path))).data();
   }
+
+  //Mensajes a español
+  translateErrorMessage(errorCode: string): string {
+    const errorMessages: { [key: string]: string } = {
+      'auth/user-not-found': 'No se encontró una cuenta con este correo.',
+      'auth/wrong-password': 'La contraseña es incorrecta.',
+      'auth/invalid-email': 'El correo proporcionado no es válido.',
+      'auth/email-already-in-use': 'Este correo ya está registrado.',
+      'auth/weak-password': 'La contraseña es demasiado débil.',
+      'auth/network-request-failed': 'Error de red. Verifica tu conexión.',
+      'auth/too-many-requests': 'Demasiados intentos. Intenta de nuevo más tarde.',
+    };
+  
+    return errorMessages[errorCode] || 'Ocurrió un error inesperado.';
+  }
 }

@@ -40,10 +40,11 @@ export class SignUpPage implements OnInit {
       }).catch(error => {
 
         console.log(error);
+        const mensaje = this.firebaseSvc.translateErrorMessage(error.code);
         this.utilsSvc.presentToast({
-          message: error.message,
+          message: mensaje,
           duration: 2500,
-          color: 'primary',
+          color: 'danger',
           position: 'middle',
           icon: 'alert-circle-outline'
         })
@@ -72,10 +73,11 @@ export class SignUpPage implements OnInit {
       }).catch(error => {
 
         console.log(error);
+        const mensaje = this.firebaseSvc.translateErrorMessage(error.code);
         this.utilsSvc.presentToast({
-          message: error.message,
+          message: mensaje,
           duration: 2500,
-          color: 'primary',
+          color: 'danger',
           position: 'middle',
           icon: 'alert-circle-outline'
         })
