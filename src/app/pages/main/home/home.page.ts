@@ -5,6 +5,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { AddUpdateListComponent } from 'src/app/shared/components/add-update-list/add-update-list.component';
 import { Timestamp } from 'firebase/firestore';
+import { orderBy } from 'firebase/firestore';
 
 @Component({
   selector: 'app-home',
@@ -29,6 +30,13 @@ export class HomePage implements OnInit {
 
   ionViewWillEnter() {
     this.getLists();
+  }
+
+  doRefresh(event: { target: { complete: () => void; }; }) {
+    setTimeout(() => {
+      this.getLists();
+      event.target.complete();
+    }, 1000);
   }
 
   formatDate(dateHour: any): string {
@@ -92,7 +100,12 @@ export class HomePage implements OnInit {
     this.user = this.utilsSvc.getFromLocalStorage('user');
     this.loading = true;
     let path = `users/${this.user.uid}/lists`;
-    let sub = this.firebaseSvc.getSubcollection(path).subscribe({
+
+    let query = [
+      orderBy('dateHour', 'desc')
+    ];
+
+    let sub = this.firebaseSvc.getSubcollection(path, query).subscribe({
       next: (res: List[]) => {
         this.lists = res;
         this.loading = false;

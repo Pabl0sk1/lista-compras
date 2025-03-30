@@ -1,5 +1,10 @@
 <app-header title="Inicio"></app-header>
 <ion-content>
+  <!--Refrescar página-->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <!--Lista de compras-->
   <div class="body-div" *ngIf="!loading">
     <h2>Listas de Compras</h2>
@@ -10,14 +15,14 @@
             <div class="content">
               <div class="content-card" (click)="addOrUpdateList(list)">
                 <div class="title">{{list.title}}</div>
-                <div class="ion-margin-top">
+                <div class="ion-margin-top noLoading">
                   <p *ngIf="list?.dateHour">{{formatDate(list.dateHour)}}</p>
                   <p [ngClass]="{'activo': list.status === 'Activo', 'completo': list.status === 'Completo'}">
                     {{ list.status }}
                   </p>
                 </div>
               </div>
-              <ion-button (click)="confirmDeleteList(list)" size="large" fill="clear" mode="ios">
+              <ion-button (click)="confirmDeleteList(list)" color="light" size="large" fill="clear" mode="ios">
                 <ion-icon color="danger" name="trash"></ion-icon>
               </ion-button>
             </div>
@@ -29,29 +34,37 @@
 
   <!--Lista de compras cargando-->
   <div class="body-div" *ngIf="loading">
+    <h2>Listas de Compras</h2>
     <ion-grid>
       <ion-row>
-        <ion-col *ngFor="let list of [1,1,1,1,1]" size="12">
+        <ion-col *ngFor="let list of [1,1,1,1,1,1,1]" size="12">
           <ion-card mode="ios" class="card-container">
             <div class="content">
               <div class="content-card">
                 <div class="title">
-                  <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
+                  <ion-skeleton-text animated style="width: 25%; height: 100%"></ion-skeleton-text>
                 </div>
                 <div class="ion-margin-top">
                   <p>
-                    <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
-                  </p>
-                  <p>
-                    <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
+                    <ion-skeleton-text animated style="width: 40%; height: 100%"></ion-skeleton-text>
+                    <ion-skeleton-text animated style="width: 15%; height: 100%"></ion-skeleton-text>
                   </p>
                 </div>
               </div>
+              <ion-avatar>
+                <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
+              </ion-avatar>
             </div>
           </ion-card>
         </ion-col>
       </ion-row>
     </ion-grid>
+  </div>
+
+  <!--Lista de compras vacía-->
+  <div *ngIf="!loading && !lists.length" class="empty">
+    <ion-icon name="newspaper"></ion-icon>
+    <h3>No hay listas de compras disponibles</h3>
   </div>
 
   <!--Nueva lista de compras-->

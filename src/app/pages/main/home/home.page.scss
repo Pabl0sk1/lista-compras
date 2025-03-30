@@ -40,9 +40,29 @@ h2 {
   text-align: center;
 }
 
-p {
+.noLoading p {
   display: inline;
-  margin-right: 8px;
+  margin-right: 10px;
+}
+
+p {
+  display: flex;
+  justify-content: start;
+  margin: 0px;
+}
+
+ion-skeleton-text {
+  margin-right: 15px;
+  --background: rgba(0, 255, 21, 0.181);
+  --background-rgb: 0, 255, 21;
+}
+
+ion-avatar {
+  margin: 15px;
+}
+
+ion-refresher-content {
+  --ion-color-primary: rgb(26, 225, 70);
 }
 
 .activo {

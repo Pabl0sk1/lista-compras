@@ -60,7 +60,7 @@ export class FirebaseService {
   //FireStore
   getSubcollection(path: string, collectionQuery?: any) {
     const ref = collection(getFirestore(), path);
-    return collectionData(query(ref, collectionQuery), { idField: 'id' });
+    return collectionData(query(ref, ...collectionQuery), { idField: 'id' });
   }
 
   addToSubcollection(path: string, data: any) {
