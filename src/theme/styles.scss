@@ -144,3 +144,15 @@ ion-button {
     font-weight: bolder;
   }
 }
+
+.add-update-modal {
+  --height: 95%;
+  --border-radius: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .add-update-modal {
+    --height: 100%;
+    --border-radius: 0;
+  }
+}

@@ -1,0 +1,46 @@
+<ion-content>
+  <app-header [isModal]=true color="dark" [title]="list ? 'Actualizar Lista' : 'Crear Lista'"></app-header>
+
+  <app-custom-input-list [control]="form.controls.title" type="text" label="Título"></app-custom-input-list>
+  <div class="validators" *ngIf="form.controls.title.errors && form.controls.title.touched">
+    <div *ngIf="form.controls.title.errors?.['required']">El título es obligatorio.</div>
+  </div>
+
+  <app-custom-input-list [control]="form.controls.dateHour" type="datetime-local"></app-custom-input-list>
+
+  <ion-item class="item-header" lines="none">
+    <ion-label>Items</ion-label>
+    <span slot="end" *ngIf="form.value.items.length">{{getPercentaje()}}%</span>
+    <ion-button color="success" mode="ios" slot="end" (click)="createItem()">
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+
+  <ion-range [value]="getPercentaje()"></ion-range>
+
+  <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
+    <div *ngFor="let item of form.value.items; index as i">
+      <ion-item lines="none">
+        <ion-checkbox mode="ios" slot="start" color="success" [(ngModel)]="item.completed"></ion-checkbox>
+
+        <ion-label class="ion-text-wrap">{{item.name}}</ion-label>
+
+        <ion-buttons slot="end">
+          <ion-button (click)="removeItem(i)" shape="round">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+
+      <ion-item class="item-reorder line-item">
+        <ion-reorder slot="end"></ion-reorder>
+      </ion-item>
+    </div>
+  </ion-reorder-group>
+</ion-content>
+<ion-footer>
+  <div class="ion-text-center">
+    <ion-button color="success" class="ion-margin" mode="ios" [disabled]="form.invalid" (click)="submit()"
+      shape="round">Guardar</ion-button>
+  </div>
+</ion-footer>

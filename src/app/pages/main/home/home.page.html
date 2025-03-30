@@ -1,8 +1,62 @@
 <app-header title="Inicio"></app-header>
 <ion-content>
+  <!--Lista de compras-->
+  <div class="body-div" *ngIf="!loading">
+    <h2>Listas de Compras</h2>
+    <ion-grid>
+      <ion-row>
+        <ion-col *ngFor="let list of lists" size="12">
+          <ion-card mode="ios" class="card-container">
+            <div class="content">
+              <div class="content-card" (click)="addOrUpdateList(list)">
+                <div class="title">{{list.title}}</div>
+                <div class="ion-margin-top">
+                  <p *ngIf="list?.dateHour">{{formatDate(list.dateHour)}}</p>
+                  <p [ngClass]="{'activo': list.status === 'Activo', 'completo': list.status === 'Completo'}">
+                    {{ list.status }}
+                  </p>
+                </div>
+              </div>
+              <ion-button (click)="confirmDeleteList(list)" size="large" fill="clear" mode="ios">
+                <ion-icon color="danger" name="trash"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!--Lista de compras cargando-->
+  <div class="body-div" *ngIf="loading">
+    <ion-grid>
+      <ion-row>
+        <ion-col *ngFor="let list of [1,1,1,1,1]" size="12">
+          <ion-card mode="ios" class="card-container">
+            <div class="content">
+              <div class="content-card">
+                <div class="title">
+                  <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
+                </div>
+                <div class="ion-margin-top">
+                  <p>
+                    <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
+                  </p>
+                  <p>
+                    <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
   <!--Nueva lista de compras-->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="dark">
+    <ion-fab-button (click)="addOrUpdateList()" color="dark">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>

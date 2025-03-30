@@ -12,24 +12,26 @@ import { UtilsService } from 'src/app/services/utils.service';
 })
 export class AuthPage implements OnInit {
 
+  firebaseSvc = inject(FirebaseService);
+  utilsSvc = inject(UtilsService);
+
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required])
   })
 
-  firebaseSvc = inject(FirebaseService);
-  utilsSvc = inject(UtilsService);
+  constructor() { }
 
   ngOnInit() {
   }
 
-  async submit(){
-    if(this.form.valid){
+  async submit() {
+    if (this.form.valid) {
 
       const loading = await this.utilsSvc.loading();
       await loading.present();
 
-      this.firebaseSvc.signIn(this.form.value as User).then(res =>{
+      this.firebaseSvc.signIn(this.form.value as User).then(res => {
         this.getUserInfo(res.user.uid);
 
       }).catch(error => {
@@ -46,19 +48,19 @@ export class AuthPage implements OnInit {
 
       }).finally(() => {
         loading.dismiss();
-      }); 
+      });
     }
   }
 
-  async getUserInfo(uid: string){
-    if(this.form.valid){
+  async getUserInfo(uid: string) {
+    if (this.form.valid) {
 
       const loading = await this.utilsSvc.loading();
       await loading.present();
 
       let path = `users/${uid}`;
 
-      this.firebaseSvc.getDocument(path).then((user: User) =>{
+      this.firebaseSvc.getDocument(path).then((user: User) => {
         this.utilsSvc.saveInLocalStorage('user', user);
         this.utilsSvc.routerLink('/main/home');
         this.form.reset();
@@ -85,7 +87,7 @@ export class AuthPage implements OnInit {
 
       }).finally(() => {
         loading.dismiss();
-      }); 
+      });
     }
   }
 }

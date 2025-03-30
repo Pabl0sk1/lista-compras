@@ -2,7 +2,11 @@
   <ion-toolbar color="dark">
 
     <ion-buttons slot="start">
-      <ion-back-button color="success" *ngIf="backButton" [defaultHref]="backButton"></ion-back-button>
+      <ion-button shape="round" (click)="dismissModal()" *ngIf="isModal">
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </ion-button>
+
+      <ion-back-button *ngIf="backButton" [defaultHref]="backButton"></ion-back-button>
     </ion-buttons>
 
     <ion-title class="title-head">{{title}}</ion-title>

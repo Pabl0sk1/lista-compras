@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, AlertOptions, LoadingController, ToastController, ToastOptions } from '@ionic/angular';
+import { AlertController, AlertOptions, LoadingController, LoadingOptions, ModalController, ModalOptions, ToastController, ToastOptions } from '@ionic/angular';
+import { List } from '../models/list.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ export class UtilsService {
   toastCtrl = inject(ToastController);
   router = inject(Router);
   alertCtrl = inject(AlertController);
+  modalCtrl = inject(ModalController);
 
   //Loading
   loading() {
@@ -18,6 +20,19 @@ export class UtilsService {
       spinner: 'crescent',
       cssClass: 'custom-load'
     });
+  }
+
+  async presentLoading(opts: LoadingOptions = {
+    spinner: 'crescent',
+    cssClass: 'custom-load'
+
+  }) {
+    const loading = await this.loadingCtrl.create(opts);
+    await loading.present();
+  }
+
+  async dismissLoading() {
+    return await this.loadingCtrl.dismiss();
   }
 
   //Toast
@@ -38,9 +53,31 @@ export class UtilsService {
     return JSON.parse(localStorage.getItem(key));
   }
 
-  //Alerta
+  //Alerta cerrar sesión
   async presentAlert(opts: AlertOptions) {
     const alert = await this.alertCtrl.create(opts);
     await alert.present();
+  }
+
+  //Agregar o actualizar lista
+  async presentModal(opts: ModalOptions) {
+    const modal = await this.modalCtrl.create(opts);
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+
+    if (data) return data;
+  }
+
+  dismissModal(data?: any) {
+    return this.modalCtrl.dismiss(data);
+  }
+
+  //Calcular porcentaje
+  getPercentaje(list: List) {
+    let completedItems = list.items.filter(item => item.completed).length;
+    let totalItems = list.items.length;
+    let per = (100 / totalItems) * completedItems;
+    return parseInt(per.toString());
   }
 }

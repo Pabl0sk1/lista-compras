@@ -1,0 +1,35 @@
+.item-header {
+  --inner-padding-start: 16px;
+  --inner-padding-end: 16px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 30px;
+  --padding-bottom: 0;
+
+  ion-label {
+    font-weight: bolder;
+    font-size: 20px;
+  }
+}
+
+ion-range {
+  --bar-background: rgba(128, 128, 128, 0.281);
+  --bar-background-active: var(--ion-color-success);
+  --height: 20px;
+  --knob-size: 5px;
+  pointer-events: none;
+}
+
+.item-reorder {
+  --min-height: 32px;
+}
+
+.line-item {
+  --border-color: #131313;
+  --inner-padding-start: 16px;
+  --inner-padding-end: 16px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+}

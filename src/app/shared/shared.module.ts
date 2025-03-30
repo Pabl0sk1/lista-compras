@@ -5,7 +5,8 @@ import { CustomInputComponent } from './components/custom-input/custom-input.com
 import { LogoComponent } from './components/logo/logo.component';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { AddUpdateListComponent } from './components/add-update-list/add-update-list.component';
+import { CustomInputListComponent } from './components/custom-input-list/custom-input-list.component';
 
 
 
@@ -13,20 +14,23 @@ import { RouterModule } from '@angular/router';
   declarations: [
     HeaderComponent,
     CustomInputComponent,
-    LogoComponent
+    LogoComponent,
+    AddUpdateListComponent,
+    CustomInputListComponent
   ],
   exports: [
     HeaderComponent,
     CustomInputComponent,
     LogoComponent,
+    AddUpdateListComponent,
+    CustomInputListComponent,
     ReactiveFormsModule
   ],
   imports: [
     CommonModule,
     IonicModule,
     ReactiveFormsModule,
-    FormsModule,
-    RouterModule
+    FormsModule
   ]
 })
 export class SharedModule { }

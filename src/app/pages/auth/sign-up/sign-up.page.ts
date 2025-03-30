@@ -12,6 +12,9 @@ import { UtilsService } from 'src/app/services/utils.service';
 })
 export class SignUpPage implements OnInit {
 
+  firebaseSvc = inject(FirebaseService);
+  utilsSvc = inject(UtilsService);
+
   form = new FormGroup({
     uid: new FormControl(''),
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -20,13 +23,12 @@ export class SignUpPage implements OnInit {
     name: new FormControl('', [Validators.required, Validators.minLength(4)])
   }, { validators: this.confirmPasswordValidator });
 
-  firebaseSvc = inject(FirebaseService);
-  utilsSvc = inject(UtilsService);
+  constructor() { }
 
   ngOnInit() {
   }
 
-  confirmPasswordValidator(group: FormGroup){
+  confirmPasswordValidator(group: FormGroup) {
     const password = group.get('password');
     const confirmPassword = group.get('confirmPassword');
 
@@ -48,13 +50,13 @@ export class SignUpPage implements OnInit {
     return null;
   }
 
-  async submit(){
-    if(this.form.valid){
+  async submit() {
+    if (this.form.valid) {
 
       const loading = await this.utilsSvc.loading();
       await loading.present();
 
-      this.firebaseSvc.signUp(this.form.value as User).then(async res =>{
+      this.firebaseSvc.signUp(this.form.value as User).then(async res => {
         await this.firebaseSvc.updateUser(this.form.value.name);
         let uid = res.user.uid;
         this.form.controls.uid.setValue(uid);
@@ -74,12 +76,12 @@ export class SignUpPage implements OnInit {
 
       }).finally(() => {
         loading.dismiss();
-      }); 
+      });
     }
   }
 
-  async setUserInfo(uid: string){
-    if(this.form.valid){
+  async setUserInfo(uid: string) {
+    if (this.form.valid) {
 
       const loading = await this.utilsSvc.loading();
       await loading.present();
@@ -88,7 +90,7 @@ export class SignUpPage implements OnInit {
       delete this.form.value.password;
       delete this.form.value.confirmPassword;
 
-      this.firebaseSvc.setDocument(path, this.form.value).then(async res =>{
+      this.firebaseSvc.setDocument(path, this.form.value).then(async res => {
         this.utilsSvc.saveInLocalStorage('user', this.form.value);
         this.utilsSvc.routerLink('/main/home');
         this.form.reset();
@@ -108,7 +110,7 @@ export class SignUpPage implements OnInit {
 
       }).finally(() => {
         loading.dismiss();
-      }); 
+      });
     }
   }
 }
