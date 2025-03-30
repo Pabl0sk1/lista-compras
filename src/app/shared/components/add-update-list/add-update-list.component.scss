@@ -33,3 +33,17 @@ ion-range {
   --padding-top: 0;
   --padding-bottom: 0;
 }
+
+ion-checkbox.custom-checkbox::part(container) {
+  background-color: white;
+  border: 1px solid black;
+}
+
+ion-checkbox.custom-checkbox[aria-checked="true"]::part(container) {
+  background-color: var(--ion-color-success);
+  border: 0px;
+}
+
+ion-checkbox.custom-checkbox::part(mark) {
+  color: white;
+}

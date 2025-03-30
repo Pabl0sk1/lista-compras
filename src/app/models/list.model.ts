@@ -1,5 +1,3 @@
-import { Timestamp } from "firebase/firestore";
-
 export interface Item {
     name: string,
     completed: boolean
@@ -14,6 +12,6 @@ export interface List {
     id: string,
     title: string,
     status: ListStatus,
-    dateHour: Timestamp,
+    dateHour: string,
     items: Item[]
 }

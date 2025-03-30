@@ -10,10 +10,11 @@
 </ion-item>
 
 <ion-item *ngIf="type == 'datetime-local'" class="ion-margin-vertical">
-  <ion-datetime-button datetime="datetime" color="success" [ariaLabel]="label"></ion-datetime-button>
+  <ion-datetime-button datetime="datetime" color="success"></ion-datetime-button>
   <ion-modal [keepContentsMounted]="true">
     <ng-template>
-      <ion-datetime id="datetime"></ion-datetime>
+      <ion-datetime id="datetime" [formControl]="control" color="dark" locale="es-ES"
+        presentation="date-time"></ion-datetime>
     </ng-template>
   </ion-modal>
 </ion-item>

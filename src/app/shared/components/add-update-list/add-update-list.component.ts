@@ -5,6 +5,7 @@ import { Item, List, ListStatus } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-add-update-list',
@@ -25,7 +26,7 @@ export class AddUpdateListComponent implements OnInit {
     id: new FormControl(''),
     title: new FormControl('', [Validators.required]),
     status: new FormControl(ListStatus.Active, [Validators.required]),
-    dateHour: new FormControl(null, [Validators.required]),
+    dateHour: new FormControl(this.formatDate(Timestamp.now()), [Validators.required]),
     items: new FormControl([], [Validators.required, Validators.minLength(1)])
   })
 
@@ -54,6 +55,40 @@ export class AddUpdateListComponent implements OnInit {
     } else {
       this.form.value.status = ListStatus.Active;
     }
+  }
+
+  formatDate(dateHour: any): string {
+    if (!dateHour) return '';
+
+    // Si es un Timestamp de Firebase
+    if (dateHour instanceof Timestamp) {
+      let localDate = dateHour.toDate();
+      localDate.setHours(localDate.getHours() - 3); // Restar 3 horas
+      return this.formatToISO8601(localDate);
+    }
+
+    // Si es un objeto con `seconds` (Firestore lo devuelve así en algunas ocasiones)
+    if (typeof dateHour === 'object' && dateHour.seconds) {
+      let localDate = new Date(dateHour.seconds * 1000);
+      localDate.setHours(localDate.getHours() - 3); // Restar 3 horas
+      return this.formatToISO8601(localDate);
+    }
+
+    // Si es un string, intentar convertirlo a fecha
+    if (typeof dateHour === 'string') {
+      let parsedDate = new Date(dateHour);
+      if (!isNaN(parsedDate.getTime())) {
+        parsedDate.setHours(parsedDate.getHours() - 3); // Restar 3 horas
+        return this.formatToISO8601(parsedDate);
+      }
+    }
+
+    return '';
+  }
+
+  formatToISO8601(date: Date): string {
+    // Convertir la fecha a formato ISO 8601: YYYY-MM-DDTHH:mm:ss
+    return date.toISOString().slice(0, 16); // Recorta la cadena para que sea del tipo YYYY-MM-DDTHH:mm
   }
 
   createList() {

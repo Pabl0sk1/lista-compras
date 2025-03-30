@@ -8,3 +8,11 @@ ion-item {
   --padding-top: 0;
   --padding-bottom: 0;
 }
+
+ion-datetime {
+  --background: #a9f997;
+  --background-rgb: 255, 241, 242;
+
+  border-radius: 8px;
+  box-shadow: rgba(var(--ion-color-success-rgb), 0.3) 0px 10px 15px -3px;
+}

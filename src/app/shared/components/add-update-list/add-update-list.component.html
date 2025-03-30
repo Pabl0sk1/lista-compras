@@ -21,7 +21,7 @@
   <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
     <div *ngFor="let item of form.value.items; index as i">
       <ion-item lines="none">
-        <ion-checkbox mode="ios" slot="start" color="success" [(ngModel)]="item.completed"></ion-checkbox>
+        <ion-checkbox class="custom-checkbox" mode="ios" slot="start" [(ngModel)]="item.completed"></ion-checkbox>
 
         <ion-label class="ion-text-wrap">{{item.name}}</ion-label>
 

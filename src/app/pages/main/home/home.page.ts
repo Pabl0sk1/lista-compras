@@ -4,6 +4,7 @@ import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { AddUpdateListComponent } from 'src/app/shared/components/add-update-list/add-update-list.component';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-home',
@@ -30,12 +31,35 @@ export class HomePage implements OnInit {
     this.getLists();
   }
 
-  formatDate(timestamp: any): string {
-    if (!timestamp) return '';
-    return timestamp.toDate().toLocaleString('es-ES', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
+  formatDate(dateHour: any): string {
+    if (!dateHour) return '';
+    // Si es un Timestamp de Firebase
+    if (dateHour instanceof Timestamp) {
+      return dateHour.toDate().toLocaleString('es-ES', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    // Si es un objeto con `seconds` (Firestore lo devuelve así en algunas ocasiones)
+    if (typeof dateHour === 'object' && dateHour.seconds) {
+      return new Date(dateHour.seconds * 1000).toLocaleString('es-ES', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    // Si es un string, intentar convertirlo a fecha
+    if (typeof dateHour === 'string') {
+      let parsedDate = new Date(dateHour);
+      if (!isNaN(parsedDate.getTime())) {
+        return parsedDate.toLocaleString('es-ES', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      }
+    }
+    return '';
   }
 
   getPercentaje(list: List) {
