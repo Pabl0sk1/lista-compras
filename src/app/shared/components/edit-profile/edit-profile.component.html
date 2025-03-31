@@ -1,0 +1,15 @@
+<ion-content>
+  <app-header [isModal]=true color="dark" title="Editar Perfil"></app-header>
+
+  <app-custom-input-list [control]="form.controls.name" type="text" label="Nombre"></app-custom-input-list>
+  <div class="validators" *ngIf="form.controls.name.errors && form.controls.name.touched">
+    <div *ngIf="form.controls.name.errors?.['required']">El nombre es obligatorio.</div>
+    <div *ngIf="form.controls.name.errors?.['minlength']">El nombre debe tener al menos 4 caracteres.</div>
+  </div>
+</ion-content>
+<ion-footer>
+  <div class="ion-text-center">
+    <ion-button color="success" class="ion-margin" mode="ios" [disabled]="form.invalid" (click)="submit()"
+      shape="round">Guardar</ion-button>
+  </div>
+</ion-footer>

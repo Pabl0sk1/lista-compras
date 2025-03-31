@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { EditProfileComponent } from 'src/app/shared/components/edit-profile/edit-profile.component';
 
 @Component({
   selector: 'app-profile',
@@ -25,6 +26,15 @@ export class ProfilePage implements OnInit {
 
   getUser() {
     return this.user = this.utilsSvc.getFromLocalStorage('user');
+  }
+
+  //Editar Perfil
+  async editProfile() {
+    let res = await this.utilsSvc.presentModal({
+      component: EditProfileComponent,
+      cssClass: 'add-update-modal'
+    })
+    if (res) this.getUser();
   }
 
   //Cerrar sesión
