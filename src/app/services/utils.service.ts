@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, AlertOptions, LoadingController, LoadingOptions, ModalController, ModalOptions, ToastController, ToastOptions } from '@ionic/angular';
-import { List } from '../models/list.model';
+import { Item, List } from '../models/list.model';
 
 @Injectable({
   providedIn: 'root'
@@ -74,9 +74,9 @@ export class UtilsService {
   }
 
   //Calcular porcentaje
-  getPercentaje(list: List) {
-    let completedItems = list.items.filter(item => item.completed).length;
-    let totalItems = list.items.length;
+  getPercentaje(list: Item[]) {
+    let completedItems = list.filter(item => item.completed).length;
+    let totalItems = list.length;
     let per = (100 / totalItems) * completedItems;
     return parseInt(per.toString());
   }

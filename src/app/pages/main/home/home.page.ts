@@ -70,10 +70,6 @@ export class HomePage implements OnInit {
     return '';
   }
 
-  getPercentaje(list: List) {
-    return this.utilsSvc.getPercentaje(list);
-  }
-
   async confirmDeleteList(list: List) {
     this.utilsSvc.presentAlert({
       header: 'Eliminar Lista',

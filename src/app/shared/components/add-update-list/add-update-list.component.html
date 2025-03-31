@@ -10,7 +10,7 @@
 
   <ion-item class="item-header" lines="none">
     <ion-label>Items</ion-label>
-    <span slot="end" *ngIf="form.value.items.length">{{getPercentaje()}}%</span>
+    <span slot="end" *ngIf="tempItems.length">{{getPercentaje()}}%</span>
     <ion-button color="success" mode="ios" slot="end" (click)="createItem()">
       <ion-icon name="add-circle-outline"></ion-icon>
     </ion-button>

@@ -157,7 +157,7 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   getPercentaje() {
-    return this.utilsSvc.getPercentaje(this.form.value as List);
+    return this.utilsSvc.getPercentaje(this.tempItems);
   }
 
   handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
