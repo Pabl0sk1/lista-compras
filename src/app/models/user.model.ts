@@ -5,5 +5,5 @@ export interface User {
     email: string,
     password: string,
     name: string,
-    lists: List
+    lists: List[]
 }

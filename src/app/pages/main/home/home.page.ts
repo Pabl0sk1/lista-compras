@@ -82,7 +82,7 @@ export class HomePage implements OnInit {
           role: 'cancel',
           cssClass: 'cancel-button'
         }, {
-          text: 'Eliminar',
+          text: 'Confirmar',
           cssClass: 'logout-button',
           handler: () => {
             this.deleteList(list);
