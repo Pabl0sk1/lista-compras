@@ -29,7 +29,12 @@ export class HomePage implements OnInit {
   }
 
   ionViewWillEnter() {
+    this.getUser();
     this.getLists();
+  }
+
+  getUser() {
+    return this.user = this.utilsSvc.getFromLocalStorage('user');
   }
 
   doRefresh(event: { target: { complete: () => void; }; }) {
