@@ -19,9 +19,10 @@
   <ion-range [value]="getPercentaje()"></ion-range>
 
   <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
-    <div *ngFor="let item of form.value.items; index as i">
+    <div *ngFor="let item of tempItems; index as i">
       <ion-item lines="none">
-        <ion-checkbox class="custom-checkbox" mode="ios" slot="start" [(ngModel)]="item.completed"></ion-checkbox>
+        <ion-checkbox class="custom-checkbox" mode="ios" slot="start" [checked]="item.completed"
+          (ionChange)="toggleItemCompleted(i, $event)"></ion-checkbox>
 
         <ion-label class="ion-text-wrap">{{item.name}}</ion-label>
 
@@ -40,7 +41,7 @@
 </ion-content>
 <ion-footer>
   <div class="ion-text-center">
-    <ion-button color="success" class="ion-margin" mode="ios" [disabled]="form.invalid" (click)="submit()"
-      shape="round">Guardar</ion-button>
+    <ion-button color="success" class="ion-margin" mode="ios" [disabled]="form.invalid || !tempItems.length"
+      (click)="submit()" shape="round">Guardar</ion-button>
   </div>
 </ion-footer>

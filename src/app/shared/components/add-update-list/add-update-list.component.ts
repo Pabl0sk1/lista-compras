@@ -21,13 +21,14 @@ export class AddUpdateListComponent implements OnInit {
   @Input() list: List;
 
   user = {} as User;
+  tempItems: Item[] = [];
 
   form = new FormGroup({
     id: new FormControl(''),
     title: new FormControl('', [Validators.required]),
     status: new FormControl(ListStatus.Active, [Validators.required]),
     dateHour: new FormControl(this.formatDate(Timestamp.now()), [Validators.required]),
-    items: new FormControl([], [Validators.required, Validators.minLength(1)])
+    items: new FormControl([])
   })
 
   constructor() { }
@@ -38,15 +39,21 @@ export class AddUpdateListComponent implements OnInit {
     if (this.list) {
       this.form.setValue(this.list);
       this.form.updateValueAndValidity();
+      this.tempItems = this.list.items.map(item => ({ ...item }));
     }
   }
 
   submit() {
     if (this.form.valid) {
+      this.form.patchValue({ items: this.tempItems });
       this.updateStatus();
       if (this.list) this.updateList();
       else this.createList();
     }
+  }
+
+  toggleItemCompleted(index: number, event: any) {
+    this.tempItems[index].completed = event.detail.checked;
   }
 
   updateStatus() {
@@ -154,8 +161,11 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
-    this.form.value.items = event.detail.complete(this.form.value.items);
-    this.form.updateValueAndValidity();
+    const fromIndex = event.detail.from;
+    const toIndex = event.detail.to;
+    const movedItem = this.tempItems.splice(fromIndex, 1)[0];
+    this.tempItems.splice(toIndex, 0, movedItem);
+    event.detail.complete();
   }
 
   createItem() {
@@ -179,9 +189,19 @@ export class AddUpdateListComponent implements OnInit {
           text: 'Agregar',
           cssClass: 'logout-button',
           handler: (res) => {
-            let item: Item = { name: res.name, completed: false };
-            this.form.value.items.push(item);
-            this.form.controls.items.updateValueAndValidity();
+            if (!res.name || !res.name.trim().length) {
+              this.utilsSvc.presentToast({
+                message: 'La descripción no puede estar vacía.',
+                color: 'danger',
+                icon: 'warning-outline',
+                duration: 2000,
+                position: 'middle'
+              })
+              this.createItem();
+            } else {
+              let item: Item = { name: res.name, completed: false };
+              this.tempItems.unshift(item);
+            }
           }
         }
       ]
@@ -189,7 +209,6 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   removeItem(index: number) {
-    this.form.value.items.splice(index, 1);
-    this.form.controls.items.updateValueAndValidity();
+    this.tempItems.splice(index, 1);
   }
 }

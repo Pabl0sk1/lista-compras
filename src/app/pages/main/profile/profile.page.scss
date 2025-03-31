@@ -10,9 +10,14 @@ ion-button {
 .email {
   font-style: italic;
   font-size: large;
+  margin-bottom: 15px;
 }
 
 h2 {
   font-weight: bolder;
   font-size: xx-large;
+}
+
+ion-item {
+  --padding-top: 15px;
 }

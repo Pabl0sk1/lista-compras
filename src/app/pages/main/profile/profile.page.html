@@ -5,9 +5,13 @@
     <h2>{{user.name}}</h2>
     <div class="email">{{user.email}}</div>
 
-    <ion-button color="dark" (click)="signOut()" shape="round">
-      Salir
-      <ion-icon slot="end" name="return-up-forward-outline"></ion-icon>
-    </ion-button>
+    <ion-item button detail>
+      <ion-icon color="dark" slot="start" name="create-outline"></ion-icon>
+      <ion-label>Editar</ion-label>
+    </ion-item>
+    <ion-item button detail (click)="signOut()">
+      <ion-icon color="dark" slot="start" name="return-up-forward-outline"></ion-icon>
+      <ion-label>Salir</ion-label>
+    </ion-item>
   </div>
 </ion-content>
