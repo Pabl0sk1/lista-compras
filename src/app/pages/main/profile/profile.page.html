@@ -13,6 +13,10 @@
       <ion-icon color="dark" slot="start" name="trash-bin-outline"></ion-icon>
       <ion-label>Eliminar Todas las Listas</ion-label>
     </ion-item>
+    <ion-item button detail (click)="confirmDeleteAccount()">
+      <ion-icon color="dark" slot="start" name="close-circle-outline"></ion-icon>
+      <ion-label>Borrar Cuenta</ion-label>
+    </ion-item>
     <ion-item button detail (click)="signOut()">
       <ion-icon color="dark" slot="start" name="return-up-forward-outline"></ion-icon>
       <ion-label>Cerrar Sesión</ion-label>

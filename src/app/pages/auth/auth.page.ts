@@ -25,14 +25,28 @@ export class AuthPage implements OnInit {
   ngOnInit() {
   }
 
+  ionViewWillEnter() {
+    this.form.reset();
+  }
+
   async submit() {
     if (this.form.valid) {
 
       const loading = await this.utilsSvc.loading();
       await loading.present();
 
-      this.firebaseSvc.signIn(this.form.value as User).then(res => {
-        this.getUserInfo(res.user.uid);
+      this.firebaseSvc.signIn(this.form.value as User).then((res) => {
+        if (res.user.emailVerified) {
+          this.getUserInfo(res.user.uid);
+        } else {
+          this.utilsSvc.presentToast({
+            message: 'Debes verificar tu correo electrónico antes de iniciar sesión.',
+            duration: 2500,
+            color: 'danger',
+            position: 'middle',
+            icon: 'alert-circle-outline'
+          })
+        }
 
       }).catch(error => {
 

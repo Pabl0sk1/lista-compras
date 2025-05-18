@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { sendEmailVerification } from '@angular/fire/auth';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -91,8 +92,8 @@ export class SignUpPage implements OnInit {
       delete this.form.value.confirmPassword;
 
       this.firebaseSvc.setDocument(path, this.form.value).then(async res => {
-        this.utilsSvc.saveInLocalStorage('user', this.form.value);
-        this.utilsSvc.routerLink('/main/home');
+        this.verificarCorreo(this.firebaseSvc.getAuth().currentUser);
+        this.firebaseSvc.signOut();
         this.form.reset();
         console.log(res);
 
@@ -112,5 +113,18 @@ export class SignUpPage implements OnInit {
         loading.dismiss();
       });
     }
+  }
+
+  verificarCorreo(currentUser: any) {
+    sendEmailVerification(currentUser)
+      .then(() => {
+        this.utilsSvc.presentToast({
+          message: 'Se ha enviado un correo de verificación. Por favor, revisa tu bandeja de entrada antes de iniciar sesión.',
+          duration: 2500,
+          color: 'success',
+          position: 'middle',
+          icon: 'mail-outline'
+        })
+      });
   }
 }

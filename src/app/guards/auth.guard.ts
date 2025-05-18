@@ -5,7 +5,6 @@ import { FirebaseService } from '../services/firebase.service';
 export const authGuard: CanActivateFn = (route, state) => {
 
   const firebaseSvc = inject(FirebaseService);
-
   const user = localStorage.getItem('user');
 
   return new Promise<boolean>((resolve) => {

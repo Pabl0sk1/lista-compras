@@ -5,6 +5,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { EditProfileComponent } from 'src/app/shared/components/edit-profile/edit-profile.component';
 import { orderBy } from 'firebase/firestore';
+import { deleteUser } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-profile',
@@ -135,5 +136,48 @@ export class ProfilePage implements OnInit {
         }
       ]
     });
+  }
+
+  //EliminarCuenta
+  confirmDeleteAccount() {
+    this.utilsSvc.presentAlert({
+      header: 'Eliminar Cuenta',
+      message: '¿Deseas eliminar su cuenta?',
+      cssClass: 'custom-alert',
+      mode: 'ios',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'cancel-button'
+        }, {
+          text: 'Confirmar',
+          cssClass: 'logout-button',
+          handler: () => {
+            this.deleteAccount();
+          }
+        }
+      ]
+    });
+  }
+
+  deleteAccount = () => {
+    const user = this.firebaseSvc.getAuth().currentUser;
+    if (user) {
+      deleteUser(user).then(() => {
+        this.utilsSvc.routerLink('/auth');
+        this.utilsSvc.presentToast({
+          message: 'Cuenta eliminada correctamente.',
+          color: 'success',
+          icon: 'checkmark-circle-outline',
+          duration: 1500,
+          position: 'middle'
+        });
+      }).catch((error) => {
+        console.log('Error al eliminar cuenta:', error.message);
+      });
+    } else {
+      console.log('No hay usuario autenticado para eliminar.');
+    }
   }
 }

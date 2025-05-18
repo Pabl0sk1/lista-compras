@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { noAuthGuard } from './guards/no-auth.guard';
 import { authGuard } from './guards/auth.guard';
+import { wildcardGuard } from './guards/wildcard.guard';
 
 const routes: Routes = [
   {
@@ -11,11 +12,18 @@ const routes: Routes = [
   },
   {
     path: 'auth',
-    loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthPageModule), canActivate: [noAuthGuard]
+    loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthPageModule),
+    canActivate: [noAuthGuard]
   },
   {
     path: 'main',
-    loadChildren: () => import('./pages/main/main.module').then(m => m.MainPageModule), canActivate: [authGuard]
+    loadChildren: () => import('./pages/main/main.module').then(m => m.MainPageModule),
+    canActivate: [authGuard]
+  },
+  {
+    path: '**',
+    loadChildren: () => import('./pages/auth/auth.module').then(m => m.AuthPageModule),
+    canActivate: [wildcardGuard]
   }
 ];
 
