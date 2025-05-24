@@ -163,7 +163,10 @@ export class ProfilePage implements OnInit {
 
   deleteAccount = () => {
     const user = this.firebaseSvc.getAuth().currentUser;
+    this.user = this.utilsSvc.getFromLocalStorage('user');
+    let path = `users/${this.user.uid}`;
     if (user) {
+      this.firebaseSvc.deleteSubCollection(path);
       deleteUser(user).then(() => {
         this.utilsSvc.routerLink('/auth');
         this.utilsSvc.presentToast({
