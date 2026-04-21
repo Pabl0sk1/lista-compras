@@ -2,8 +2,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+    "paths": {
+      "*": ["./*"]
+    },
     "outDir": "./dist/out-tsc",
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "strict": false,
@@ -18,10 +21,7 @@
     "importHelpers": true,
     "target": "es2022",
     "module": "es2020",
-    "lib": [
-      "es2018",
-      "dom"
-    ],
+    "lib": ["es2018", "dom"],
     "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
