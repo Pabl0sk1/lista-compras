@@ -2,7 +2,6 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ItemReorderEventDetail } from '@ionic/angular';
 import { Item, List, ListStatus } from 'src/app/models/list.model';
-import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { Timestamp } from 'firebase/firestore';
@@ -20,12 +19,11 @@ export class AddUpdateListComponent implements OnInit {
 
   @Input() list: List;
 
-  user = {} as User;
   tempItems: Item[] = [];
 
   form = new FormGroup({
     id: new FormControl(''),
-    title: new FormControl('', [Validators.required]),
+    title: new FormControl('', [Validators.required, Validators.maxLength(100)]),
     status: new FormControl(ListStatus.Active, [Validators.required]),
     dateHour: new FormControl(this.formatDate(Timestamp.now()), [Validators.required]),
     items: new FormControl([])
@@ -34,8 +32,6 @@ export class AddUpdateListComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.user = this.utilsSvc.getFromLocalStorage('user');
-
     if (this.list) {
       this.form.setValue(this.list);
       this.form.updateValueAndValidity();
@@ -57,11 +53,20 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   updateStatus() {
-    if (this.getPercentaje() == 100) {
-      this.form.value.status = ListStatus.Completed;
-    } else {
-      this.form.value.status = ListStatus.Active;
-    }
+    // setValue sobre el control, no mutar form.value (que es interno de Angular)
+    this.form.controls.status.setValue(
+      this.getPercentaje() == 100 ? ListStatus.Completed : ListStatus.Active
+    );
+  }
+
+  // Payload explícito con solo los campos permitidos por las reglas de Firestore
+  private buildPayload() {
+    return {
+      title: this.form.controls.title.value,
+      status: this.form.controls.status.value,
+      dateHour: this.form.controls.dateHour.value,
+      items: this.tempItems.map(item => ({ name: item.name, completed: item.completed }))
+    };
   }
 
   formatDate(dateHour: any): string {
@@ -99,11 +104,10 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   createList() {
-    let path = `users/${this.user.uid}/lists`;
+    let path = `users/${this.firebaseSvc.getUid()}/lists`;
     this.utilsSvc.presentLoading();
-    delete this.form.value.id;
 
-    this.firebaseSvc.addToSubcollection(path, this.form.value).then(() => {
+    this.firebaseSvc.addToSubcollection(path, this.buildPayload()).then(() => {
       this.utilsSvc.dismissModal({ success: true });
       this.utilsSvc.presentToast({
         message: 'Lista creada éxitosamente.',
@@ -128,11 +132,10 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   updateList() {
-    let path = `users/${this.user.uid}/lists/${this.list.id}`;
+    let path = `users/${this.firebaseSvc.getUid()}/lists/${this.list.id}`;
     this.utilsSvc.presentLoading();
-    delete this.form.value.id;
 
-    this.firebaseSvc.updateSubCollection(path, this.form.value).then(() => {
+    this.firebaseSvc.updateSubCollection(path, this.buildPayload()).then(() => {
       this.utilsSvc.dismissModal({ success: true });
       this.utilsSvc.presentToast({
         message: 'Lista actualizada éxitosamente.',

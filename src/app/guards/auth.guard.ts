@@ -1,23 +1,27 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { FirebaseService } from '../services/firebase.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (): Promise<boolean | UrlTree> => {
 
   const firebaseSvc = inject(FirebaseService);
-  const user = localStorage.getItem('user');
+  const router = inject(Router);
 
-  return new Promise<boolean>((resolve) => {
+  return new Promise<boolean | UrlTree>((resolve) => {
 
-    firebaseSvc.getAuth().onAuthStateChanged((auth) => {
+    // onAuthStateChanged devuelve la función para cancelar la suscripción:
+    // sin ella se acumula un listener por cada navegación.
+    const unsubscribe = firebaseSvc.getAuth().onAuthStateChanged(async (auth) => {
+      unsubscribe();
 
-      if (auth) {
-        if (user) resolve(true);
-      } else {
-        firebaseSvc.signOut();
-        resolve(false);
+      // Solo pasan usuarios autenticados y con el correo verificado.
+      if (auth && auth.emailVerified) {
+        resolve(true);
+        return;
       }
 
-    })
+      await firebaseSvc.clearSession();
+      resolve(router.parseUrl('/auth'));
+    });
   });
 };

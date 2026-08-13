@@ -4,6 +4,7 @@
   <app-custom-input-list [control]="form.controls.title" type="text" label="Título"></app-custom-input-list>
   <div class="validators" *ngIf="form.controls.title.errors && form.controls.title.touched">
     <div *ngIf="form.controls.title.errors?.['required']">El título es obligatorio.</div>
+    <div *ngIf="form.controls.title.errors?.['maxlength']">El título no puede superar los 100 caracteres.</div>
   </div>
 
   <app-custom-input-list [control]="form.controls.dateHour" type="datetime-local"></app-custom-input-list>

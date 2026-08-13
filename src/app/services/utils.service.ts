@@ -50,7 +50,15 @@ export class UtilsService {
   }
 
   getFromLocalStorage(key: string) {
-    return JSON.parse(localStorage.getItem(key));
+    // localStorage lo puede manipular el usuario: un JSON inválido no debe
+    // tumbar la app entera con una excepción sin capturar.
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      localStorage.removeItem(key);
+      return null;
+    }
   }
 
   //Alerta cerrar sesión
@@ -75,9 +83,9 @@ export class UtilsService {
 
   //Calcular porcentaje
   getPercentaje(list: Item[]) {
-    let completedItems = list.filter(item => item.completed).length;
-    let totalItems = list.length;
-    let per = (100 / totalItems) * completedItems;
-    return parseInt(per.toString());
+    if (!list?.length) return 0; // evita el NaN de dividir entre 0
+    const completedItems = list.filter(item => item.completed).length;
+    // floor, no round: con round una lista al 99,5% se marcaría como "Completo"
+    return Math.floor((completedItems / list.length) * 100);
   }
 }

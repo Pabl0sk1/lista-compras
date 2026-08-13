@@ -20,6 +20,12 @@ export class FirebaseService {
     return getAuth();
   }
 
+  // uid de confianza: viene de la sesión de Firebase, no de localStorage
+  // (localStorage lo puede editar cualquiera desde el navegador).
+  getUid(): string | null {
+    return getAuth().currentUser?.uid ?? null;
+  }
+
   //Acceder
   signIn(user: User) {
     return signInWithEmailAndPassword(getAuth(), user.email, user.password);
@@ -30,16 +36,23 @@ export class FirebaseService {
     return createUserWithEmailAndPassword(getAuth(), user.email, user.password);
   }
 
-  //Cerrar Sesión
-  signOut() {
-    getAuth().signOut();
+  //Cerrar Sesión (sin navegar): útil desde los guards
+  async clearSession() {
+    await getAuth().signOut();
     localStorage.removeItem('user');
-    this.utilsSvc.routerLink('/auth');
+  }
+
+  //Cerrar Sesión
+  async signOut() {
+    await this.clearSession();
+    return this.utilsSvc.routerLink('/auth');
   }
 
   //Actualizar
   updateUser(displayName: string) {
-    return updateProfile(getAuth().currentUser, { displayName });
+    const currentUser = getAuth().currentUser;
+    if (!currentUser) return Promise.reject(new Error('No hay una sesión activa.'));
+    return updateProfile(currentUser, { displayName });
   }
 
   //Enviar email para restablecer contraseña
@@ -52,13 +65,27 @@ export class FirebaseService {
     return (await getDoc(doc(getFirestore(), path))).data();
   }
 
+  // Devuelve el perfil local y, si falta (localStorage borrado), lo recupera
+  // de Firestore. Evita que la UI se rompa con una sesión válida sin perfil.
+  async ensureLocalUser(): Promise<User | null> {
+    const local = this.utilsSvc.getFromLocalStorage('user');
+    if (local?.uid) return local;
+
+    const uid = this.getUid();
+    if (!uid) return null;
+
+    const profile = await this.getDocument(`users/${uid}`) as User;
+    if (profile) this.utilsSvc.saveInLocalStorage('user', profile);
+    return profile ?? null;
+  }
+
   //Setear documento
   setDocument(path: string, data: any) {
     return setDoc(doc(getFirestore(), path), data);
   }
 
   //FireStore
-  getSubcollection(path: string, collectionQuery?: any) {
+  getSubcollection(path: string, collectionQuery: any[] = []) {
     const ref = collection(getFirestore(), path);
     return collectionData(query(ref, ...collectionQuery), { idField: 'id' });
   }

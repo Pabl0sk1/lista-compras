@@ -19,7 +19,12 @@ export class SignUpPage implements OnInit {
   form = new FormGroup({
     uid: new FormControl(''),
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8),
+      // Al menos una letra y un número
+      Validators.pattern(/^(?=.*[A-Za-zÁÉÍÓÚáéíóúÑñ])(?=.*\d).+$/)
+    ]),
     confirmPassword: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required, Validators.minLength(4)])
   }, { validators: this.confirmPasswordValidator });
@@ -88,10 +93,17 @@ export class SignUpPage implements OnInit {
       await loading.present();
 
       let path = `users/${uid}`;
-      delete this.form.value.password;
-      delete this.form.value.confirmPassword;
 
-      this.firebaseSvc.setDocument(path, this.form.value).then(async res => {
+      // Payload explícito: la contraseña NUNCA debe llegar a Firestore.
+      // (Antes se hacía `delete this.form.value.password`, lo que dependía de
+      // que Angular devolviera siempre el mismo objeto mutable en form.value.)
+      const profile = {
+        uid,
+        email: this.form.controls.email.value,
+        name: this.form.controls.name.value
+      };
+
+      this.firebaseSvc.setDocument(path, profile).then(async res => {
         this.verificarCorreo(this.firebaseSvc.getAuth().currentUser);
         this.firebaseSvc.signOut();
         this.form.reset();

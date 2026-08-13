@@ -1,23 +1,21 @@
-import { CanActivateFn } from '@angular/router';
-import { FirebaseService } from '../services/firebase.service';
-import { UtilsService } from '../services/utils.service';
 import { inject } from '@angular/core';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
+import { FirebaseService } from '../services/firebase.service';
 
-export const noAuthGuard: CanActivateFn = (route, state) => {
+export const noAuthGuard: CanActivateFn = (): Promise<boolean | UrlTree> => {
 
   const firebaseSvc = inject(FirebaseService);
-  const utilsSvc = inject(UtilsService);
+  const router = inject(Router);
 
-  return new Promise<boolean>((resolve) => {
+  return new Promise<boolean | UrlTree>((resolve) => {
 
-    firebaseSvc.getAuth().onAuthStateChanged((auth) => {
+    const unsubscribe = firebaseSvc.getAuth().onAuthStateChanged((auth) => {
+      unsubscribe();
 
-      if(!auth) resolve(true);
-      else{
-        utilsSvc.routerLink('/main/home');
-        resolve(false);
-      }
-
-    })
+      // Un usuario sin verificar todavía debe poder llegar a /auth,
+      // si no queda rebotando entre este guard y authGuard.
+      if (auth && auth.emailVerified) resolve(router.parseUrl('/main/home'));
+      else resolve(true);
+    });
   });
 };

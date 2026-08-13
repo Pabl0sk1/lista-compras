@@ -33,8 +33,8 @@ export class HomePage implements OnInit {
     this.getLists();
   }
 
-  getUser() {
-    return this.user = this.utilsSvc.getFromLocalStorage('user');
+  async getUser() {
+    return this.user = await this.firebaseSvc.ensureLocalUser() ?? {} as User;
   }
 
   doRefresh(event: { target: { complete: () => void; }; }) {
@@ -98,9 +98,8 @@ export class HomePage implements OnInit {
   }
 
   getLists() {
-    this.user = this.utilsSvc.getFromLocalStorage('user');
     this.loading = true;
-    let path = `users/${this.user.uid}/lists`;
+    let path = `users/${this.firebaseSvc.getUid()}/lists`;
 
     let query = [
       orderBy('dateHour', 'desc')
@@ -128,8 +127,7 @@ export class HomePage implements OnInit {
   }
 
   deleteList(list: List) {
-    this.user = this.utilsSvc.getFromLocalStorage('user');
-    let path = `users/${this.user.uid}/lists/${list.id}`;
+    let path = `users/${this.firebaseSvc.getUid()}/lists/${list.id}`;
     this.utilsSvc.presentLoading();
 
     this.firebaseSvc.deleteSubCollection(path).then(() => {

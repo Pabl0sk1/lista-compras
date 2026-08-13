@@ -29,8 +29,8 @@ export class ProfilePage implements OnInit {
     this.getLists();
   }
 
-  getUser() {
-    return this.user = this.utilsSvc.getFromLocalStorage('user');
+  async getUser() {
+    return this.user = await this.firebaseSvc.ensureLocalUser() ?? {} as User;
   }
 
   //Editar Perfil
@@ -91,8 +91,7 @@ export class ProfilePage implements OnInit {
   }
 
   getLists() {
-    this.user = this.utilsSvc.getFromLocalStorage('user');
-    let path = `users/${this.user.uid}/lists`;
+    let path = `users/${this.firebaseSvc.getUid()}/lists`;
 
     let query = [
       orderBy('dateHour', 'desc')
@@ -110,8 +109,7 @@ export class ProfilePage implements OnInit {
   }
 
   deleteList(listId: string) {
-    this.user = this.utilsSvc.getFromLocalStorage('user');
-    let path = `users/${this.user.uid}/lists/${listId}`;
+    let path = `users/${this.firebaseSvc.getUid()}/lists/${listId}`;
     return this.firebaseSvc.deleteSubCollection(path);
   }
 
@@ -161,26 +159,52 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  deleteAccount = () => {
-    const user = this.firebaseSvc.getAuth().currentUser;
-    this.user = this.utilsSvc.getFromLocalStorage('user');
-    let path = `users/${this.user.uid}`;
-    if (user) {
-      this.firebaseSvc.deleteSubCollection(path);
-      deleteUser(user).then(() => {
-        this.utilsSvc.routerLink('/auth');
-        this.utilsSvc.presentToast({
-          message: 'Cuenta eliminada correctamente.',
-          color: 'success',
-          icon: 'checkmark-circle-outline',
-          duration: 1500,
-          position: 'middle'
-        });
-      }).catch((error) => {
-        console.log('Error al eliminar cuenta:', error.message);
+  deleteAccount = async () => {
+    const currentUser = this.firebaseSvc.getAuth().currentUser;
+
+    if (!currentUser) {
+      await this.firebaseSvc.signOut();
+      return;
+    }
+
+    try {
+      await this.utilsSvc.presentLoading();
+
+      // Orden importante: primero los datos (mientras hay sesión y permisos),
+      // después la cuenta. Borrar la cuenta antes dejaría las listas huérfanas
+      // en Firestore para siempre, porque las subcolecciones no se borran solas.
+      await Promise.all(this.lists.map((li) => this.deleteList(li.id)));
+      await this.firebaseSvc.deleteSubCollection(`users/${currentUser.uid}`);
+      await deleteUser(currentUser);
+
+      localStorage.removeItem('user');
+      this.utilsSvc.routerLink('/auth');
+      this.utilsSvc.presentToast({
+        message: 'Cuenta eliminada correctamente.',
+        color: 'success',
+        icon: 'checkmark-circle-outline',
+        duration: 1500,
+        position: 'middle'
       });
-    } else {
-      console.log('No hay usuario autenticado para eliminar.');
+
+    } catch (error) {
+      // Firebase exige una sesión reciente para borrar una cuenta
+      const mensaje = error?.code === 'auth/requires-recent-login'
+        ? 'Por seguridad, vuelve a iniciar sesión antes de eliminar tu cuenta.'
+        : this.firebaseSvc.translateErrorMessage(error?.code);
+
+      this.utilsSvc.presentToast({
+        message: mensaje,
+        color: 'warning',
+        icon: 'alert-circle-outline',
+        duration: 5000,
+        position: 'middle'
+      });
+
+      if (error?.code === 'auth/requires-recent-login') await this.firebaseSvc.signOut();
+
+    } finally {
+      this.utilsSvc.dismissLoading();
     }
   }
 }

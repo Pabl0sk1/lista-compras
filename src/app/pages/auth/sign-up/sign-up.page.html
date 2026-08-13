@@ -18,14 +18,17 @@
         <div *ngIf="form.controls.email.errors?.['email']">El correo es inválido.</div>
       </div>
 
-      <app-custom-input icon="lock-closed-outline" [control]="form.controls.password" type="password"
-        label="Contraseña"></app-custom-input>
+      <app-custom-input icon="lock-closed-outline" autocomplete="new-password" [control]="form.controls.password"
+        type="password" label="Contraseña"></app-custom-input>
       <div class="validators" *ngIf="form.controls.password.errors && form.controls.password.touched">
         <div *ngIf="form.controls.password.errors?.['required']">La contraseña es obligatoria.</div>
+        <div *ngIf="form.controls.password.errors?.['minlength']">La contraseña debe tener al menos 8 caracteres.</div>
+        <div *ngIf="form.controls.password.errors?.['pattern']">La contraseña debe incluir al menos una letra y un
+          número.</div>
       </div>
 
-      <app-custom-input icon="checkmark-circle-outline" [control]="form.controls.confirmPassword" type="password"
-        label="Confirmar Contraseña"></app-custom-input>
+      <app-custom-input icon="checkmark-circle-outline" autocomplete="new-password"
+        [control]="form.controls.confirmPassword" type="password" label="Confirmar Contraseña"></app-custom-input>
       <div class="validators" *ngIf="form.controls.confirmPassword.errors && form.controls.confirmPassword.touched">
         <div *ngIf="form.controls.confirmPassword.errors?.['required']">La confirmación de la contraseña es obligatoria.
         </div>

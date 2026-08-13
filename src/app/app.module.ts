@@ -10,7 +10,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-import { environment } from 'src/environments/environment.prod';
+// environment.ts, no environment.prod.ts: angular.json ya hace el reemplazo
+// en las builds de producción (fileReplacements).
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [AppComponent],

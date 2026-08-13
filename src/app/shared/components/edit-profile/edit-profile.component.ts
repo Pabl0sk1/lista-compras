@@ -25,8 +25,8 @@ export class EditProfileComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-    this.user = this.utilsSvc.getFromLocalStorage('user');
+  async ngOnInit() {
+    this.user = await this.firebaseSvc.ensureLocalUser() ?? {} as User;
 
     this.form.patchValue({
       uid: this.user.uid,
@@ -45,7 +45,8 @@ export class EditProfileComponent implements OnInit {
     this.utilsSvc.presentLoading();
 
     this.firebaseSvc.updateUser(this.form.value.name).then(() => {
-      this.updateProfile(this.form.value.uid);
+      // uid de la sesión, no el del formulario (que viene de localStorage)
+      this.updateProfile(this.firebaseSvc.getUid());
 
     }, error => {
 
@@ -63,7 +64,14 @@ export class EditProfileComponent implements OnInit {
   updateProfile(uid: string) {
     let path = `users/${uid}`;
 
-    this.firebaseSvc.setDocument(path, this.form.value).then(() => {
+    // Payload explícito: uid y email se toman de la sesión, no del formulario
+    const profile = {
+      uid,
+      email: this.firebaseSvc.getAuth().currentUser?.email ?? this.form.value.email,
+      name: this.form.value.name
+    };
+
+    this.firebaseSvc.setDocument(path, profile).then(() => {
       this.user.name = this.form.value.name;
       this.utilsSvc.saveInLocalStorage('user', this.user);
 
