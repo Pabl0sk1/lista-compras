@@ -4,7 +4,7 @@ import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { EditProfileComponent } from 'src/app/shared/components/edit-profile/edit-profile.component';
-import { orderBy } from 'firebase/firestore';
+import { orderBy } from '@angular/fire/firestore';
 import { deleteUser } from '@angular/fire/auth';
 
 @Component({

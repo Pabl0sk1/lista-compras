@@ -4,7 +4,7 @@ import { ItemReorderEventDetail } from '@ionic/angular';
 import { Item, List, ListStatus } from 'src/app/models/list.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-add-update-list',

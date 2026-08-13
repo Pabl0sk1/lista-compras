@@ -4,8 +4,8 @@ import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { AddUpdateListComponent } from 'src/app/shared/components/add-update-list/add-update-list.component';
-import { Timestamp } from 'firebase/firestore';
-import { orderBy } from 'firebase/firestore';
+import { Timestamp } from '@angular/fire/firestore';
+import { orderBy } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',

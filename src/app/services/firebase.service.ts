@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from '@angular/fire/auth';
 import { User } from '../models/user.model';
 import { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, getFirestore, collection, collectionData, query } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
