@@ -64,12 +64,15 @@ export class EditProfileComponent implements OnInit {
   updateProfile(uid: string) {
     let path = `users/${uid}`;
 
-    // Payload explícito: uid y email se toman de la sesión, no del formulario
-    const profile = {
+    // Payload explícito: uid y email se toman de la sesión, no del formulario.
+    // La foto se arrastra tal cual: setDocument reemplaza el documento entero,
+    // así que omitirla aquí la borraría al guardar el nombre.
+    const profile: any = {
       uid,
       email: this.firebaseSvc.getAuth().currentUser?.email ?? this.form.value.email,
       name: this.form.value.name
     };
+    if (this.user.photo) profile.photo = this.user.photo;
 
     this.firebaseSvc.setDocument(path, profile).then(() => {
       this.user.name = this.form.value.name;

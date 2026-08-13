@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { List } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -24,6 +24,8 @@ export class ProfilePage implements OnInit {
   utilsSvc = inject(UtilsService);
   themeSvc = inject(ThemeService);
 
+  @ViewChild('selectorFoto') selectorFoto!: ElementRef<HTMLInputElement>;
+
   ngOnInit() {
   }
 
@@ -48,6 +50,108 @@ export class ProfilePage implements OnInit {
 
   cambiarTema(event: CustomEvent) {
     this.themeSvc.setTema(event.detail.value as Tema);
+  }
+
+  // ---- Foto de perfil ----
+  async opcionesFoto() {
+    const botones: any[] = [
+      {
+        text: this.user.photo ? 'Cambiar foto' : 'Elegir foto',
+        icon: 'image-outline',
+        handler: () => this.selectorFoto.nativeElement.click()
+      }
+    ];
+
+    if (this.user.photo) {
+      botones.push({
+        text: 'Eliminar foto',
+        icon: 'trash-outline',
+        role: 'destructive',
+        handler: () => this.eliminarFoto()
+      });
+    }
+
+    botones.push({ text: 'Cancelar', icon: 'close-outline', role: 'cancel' });
+
+    await this.utilsSvc.presentActionSheet({
+      header: 'Foto de perfil',
+      cssClass: 'custom-sheet',
+      mode: 'ios',
+      buttons: botones
+    });
+  }
+
+  async fotoElegida(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    // Se limpia siempre: si no, elegir el mismo archivo dos veces no dispara change
+    input.value = '';
+    if (!file) return;
+
+    // Descarte temprano: decodificar un archivo enorme puede tumbar la pestaña
+    if (file.size > 12 * 1024 * 1024) {
+      return this.avisar('La imagen es demasiado grande (máximo 12 MB).', 'warning');
+    }
+
+    try {
+      await this.utilsSvc.presentLoading();
+      const dataUrl = await this.utilsSvc.imagenADataUrl(file);
+      await this.guardarPerfil({ ...this.user, photo: dataUrl });
+      this.avisar('Foto actualizada.', 'success');
+    } catch (error) {
+      this.avisar(this.firebaseSvc.translateErrorMessage(error?.code), 'danger');
+    } finally {
+      this.utilsSvc.dismissLoading();
+    }
+  }
+
+  eliminarFoto() {
+    this.utilsSvc.presentAlert({
+      header: 'Eliminar foto',
+      message: '¿Quieres quitar tu foto de perfil?',
+      cssClass: 'custom-alert peligro',
+      mode: 'ios',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel', cssClass: 'cancel-button' },
+        {
+          text: 'Eliminar',
+          cssClass: 'logout-button',
+          handler: async () => {
+            try {
+              await this.utilsSvc.presentLoading();
+              const { photo, ...sinFoto } = this.user;
+              await this.guardarPerfil(sinFoto as User);
+              this.avisar('Foto eliminada.', 'success');
+            } catch (error) {
+              this.avisar(this.firebaseSvc.translateErrorMessage(error?.code), 'danger');
+            } finally {
+              this.utilsSvc.dismissLoading();
+            }
+          }
+        }
+      ]
+    });
+  }
+
+  /** Guarda el perfil completo y refresca la copia local */
+  private async guardarPerfil(user: User) {
+    const uid = this.firebaseSvc.getUid();
+    const perfil: any = { uid, email: user.email, name: user.name };
+    if (user.photo) perfil.photo = user.photo;
+
+    await this.firebaseSvc.setDocument(`users/${uid}`, perfil);
+    this.user = perfil;
+    this.utilsSvc.saveInLocalStorage('user', perfil);
+  }
+
+  private avisar(message: string, color: string) {
+    this.utilsSvc.presentToast({
+      message,
+      color,
+      icon: color === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline',
+      duration: 2000,
+      position: 'middle'
+    });
   }
 
   //Editar Perfil

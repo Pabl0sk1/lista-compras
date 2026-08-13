@@ -368,6 +368,23 @@ ion-button {
   --spinner-color: var(--ion-color-primary);
 }
 
+// ---------- Menú de acciones ----------
+.custom-sheet {
+  --background: var(--se-superficie);
+  --color: var(--se-texto);
+  --button-background: var(--se-superficie);
+  --button-color: var(--se-texto);
+
+  .action-sheet-title {
+    color: var(--se-texto-suave);
+    font-weight: 600;
+  }
+
+  .action-sheet-destructive {
+    --button-color: var(--ion-color-danger);
+  }
+}
+
 // ---------- Toasts ----------
 ion-toast {
   --border-radius: var(--se-radio);

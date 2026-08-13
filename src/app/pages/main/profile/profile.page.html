@@ -3,7 +3,19 @@
   <div class="perfil">
 
     <section class="perfil__tarjeta">
-      <div class="perfil__avatar">{{inicial()}}</div>
+      <button class="perfil__avatar" (click)="opcionesFoto()"
+        [attr.aria-label]="user.photo ? 'Cambiar o eliminar tu foto' : 'Añadir una foto de perfil'">
+        <img *ngIf="user.photo" [src]="user.photo" alt="" />
+        <span class="perfil__inicial" *ngIf="!user.photo">{{inicial()}}</span>
+        <span class="perfil__camara">
+          <ion-icon name="camera" aria-hidden="true"></ion-icon>
+        </span>
+      </button>
+
+      <!-- Selector nativo, oculto: lo dispara el avatar -->
+      <input #selectorFoto type="file" accept="image/png,image/jpeg,image/webp" hidden
+        (change)="fotoElegida($event)" />
+
       <h2 class="perfil__nombre">{{user.name}}</h2>
       <p class="perfil__email">{{user.email}}</p>
     </section>

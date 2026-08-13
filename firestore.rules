@@ -23,15 +23,29 @@ service cloud.firestore {
       return request.resource.data;
     }
 
+    // La foto va incrustada en el propio documento como data URL (el proyecto
+    // no usa Storage). Hay que acotarla: sin límite, cualquiera podría llenar
+    // su documento hasta el máximo de 1 MiB de Firestore.
+    // 80.000 caracteres en base64 ≈ 60 KB de imagen, de sobra para un avatar
+    // de 256 px, que ronda los 20-30 KB.
+    function validPhoto() {
+      return !('photo' in incoming())
+        || (incoming().photo is string
+            && incoming().photo.size() <= 80000
+            && incoming().photo.matches('data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]*'));
+    }
+
     // El perfil no puede contener contraseñas ni suplantar a otro usuario
     function validProfile(uid) {
-      return incoming().keys().hasOnly(['uid', 'email', 'name'])
+      return incoming().keys().hasOnly(['uid', 'email', 'name', 'photo'])
+        && incoming().keys().hasAll(['uid', 'email', 'name'])
         && incoming().uid == uid
         && incoming().email is string
         && incoming().email == request.auth.token.email
         && incoming().name is string
         && incoming().name.size() >= 4
-        && incoming().name.size() <= 50;
+        && incoming().name.size() <= 50
+        && validPhoto();
     }
 
     function validList() {

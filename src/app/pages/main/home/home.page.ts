@@ -37,6 +37,34 @@ export class HomePage implements OnInit {
     return this.user = await this.firebaseSvc.ensureLocalUser() ?? {} as User;
   }
 
+  /** Saludo según la hora del día */
+  saludo(): string {
+    const hora = new Date().getHours();
+    if (hora < 6) return 'Buenas noches';
+    if (hora < 13) return 'Buenos días';
+    if (hora < 20) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+
+  /** Solo el nombre de pila: "Buenas tardes, Pablo Miguel Ocampos" queda raro */
+  primerNombre(): string {
+    return (this.user?.name ?? '').trim().split(' ')[0];
+  }
+
+  /** Resumen de lo que le espera al usuario */
+  resumen(): string {
+    if (this.loading) return 'Cargando tus listas…';
+    if (!this.lists.length) return 'Aún no tienes ninguna lista';
+
+    const activas = this.lists.filter(l => l.status === 'Activo').length;
+    if (!activas) {
+      return this.lists.length === 1
+        ? 'Tu lista está completa'
+        : 'Tienes todas las listas completas';
+    }
+    return activas === 1 ? 'Tienes 1 lista activa' : `Tienes ${activas} listas activas`;
+  }
+
   /** Items marcados de una lista */
   getCompletados(list: List): number {
     return list.items?.filter(item => item.completed).length ?? 0;

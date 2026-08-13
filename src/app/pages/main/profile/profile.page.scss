@@ -15,17 +15,65 @@
 }
 
 .perfil__avatar {
-  width: 76px;
-  height: 76px;
+  position: relative;
+  width: 88px;
+  height: 88px;
   margin: 0 auto 14px;
-  display: grid;
-  place-items: center;
+  display: block;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: linear-gradient(160deg, var(--se-green-500), var(--se-green-700));
   color: #fff;
-  font-size: 30px;
+  cursor: pointer;
+  transition: transform .15s ease;
+
+  &:active {
+    transform: scale(.96);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 3px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.perfil__inicial {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
   font-weight: 700;
   line-height: 1;
+}
+
+// Distintivo de cámara: hace evidente que el avatar se puede tocar
+.perfil__camara {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--se-superficie);
+  border: 1px solid var(--se-borde);
+  box-shadow: var(--se-sombra);
+  color: var(--se-texto-suave);
+
+  ion-icon {
+    font-size: 15px;
+  }
 }
 
 .perfil__nombre {

@@ -9,10 +9,10 @@
 
     <!--Lista de compras-->
     <ng-container *ngIf="!loading">
-      <div class="se-seccion" *ngIf="lists.length">
-        <h2>Tus listas</h2>
-        <span class="se-contador">{{lists.length}} {{lists.length === 1 ? 'lista' : 'listas'}}</span>
-      </div>
+      <header class="saludo">
+        <h2>{{saludo()}}<span *ngIf="primerNombre()">, {{primerNombre()}}</span></h2>
+        <p>{{resumen()}}</p>
+      </header>
 
       <article class="lista-card" *ngFor="let list of lists" (click)="addOrUpdateList(list)">
         <div class="lista-card__texto">
@@ -40,9 +40,10 @@
 
     <!--Lista de compras cargando-->
     <ng-container *ngIf="loading">
-      <div class="se-seccion">
-        <h2>Tus listas</h2>
-      </div>
+      <header class="saludo">
+        <h2>{{saludo()}}<span *ngIf="primerNombre()">, {{primerNombre()}}</span></h2>
+        <p>{{resumen()}}</p>
+      </header>
       <article class="lista-card" *ngFor="let s of [1,2,3,4]">
         <div class="lista-card__texto">
           <ion-skeleton-text animated style="width: 45%; height: 19px; margin: 0 0 12px"></ion-skeleton-text>

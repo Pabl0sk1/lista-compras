@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, AlertOptions, LoadingController, LoadingOptions, ModalController, ModalOptions, ToastController, ToastOptions } from '@ionic/angular';
+import { ActionSheetController, ActionSheetOptions, AlertController, AlertOptions, LoadingController, LoadingOptions, ModalController, ModalOptions, ToastController, ToastOptions } from '@ionic/angular';
 import { Item, List } from '../models/list.model';
 
 @Injectable({
@@ -13,6 +13,7 @@ export class UtilsService {
   router = inject(Router);
   alertCtrl = inject(AlertController);
   modalCtrl = inject(ModalController);
+  actionSheetCtrl = inject(ActionSheetController);
 
   //Loading
   loading() {
@@ -65,6 +66,37 @@ export class UtilsService {
   async presentAlert(opts: AlertOptions) {
     const alert = await this.alertCtrl.create(opts);
     await alert.present();
+  }
+
+  async presentActionSheet(opts: ActionSheetOptions) {
+    const sheet = await this.actionSheetCtrl.create(opts);
+    await sheet.present();
+    return sheet.onWillDismiss();
+  }
+
+  /**
+   * Recorta la imagen a un cuadrado centrado, la reduce a `lado` px y la
+   * devuelve como data URL JPEG.
+   *
+   * Se hace en el cliente a propósito: la foto se guarda dentro del documento
+   * de Firestore, así que subir el original de varios MB no cabría (límite de
+   * 1 MiB por documento) y además gastaría datos del usuario para nada.
+   */
+  async imagenADataUrl(file: File, lado = 256, calidad = 0.75): Promise<string> {
+    const bitmap = await createImageBitmap(file);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = lado;
+    const ctx = canvas.getContext('2d');
+
+    // Recorte cuadrado centrado: así no se deforma la foto
+    const menor = Math.min(bitmap.width, bitmap.height);
+    const x = (bitmap.width - menor) / 2;
+    const y = (bitmap.height - menor) / 2;
+    ctx.drawImage(bitmap, x, y, menor, menor, 0, 0, lado, lado);
+    bitmap.close?.();
+
+    return canvas.toDataURL('image/jpeg', calidad);
   }
 
   //Agregar o actualizar lista
