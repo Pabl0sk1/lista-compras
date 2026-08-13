@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
 import { User } from '../models/user.model';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, getFirestore, collection, collectionData, query } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
 
@@ -10,7 +9,6 @@ import { UtilsService } from './utils.service';
 })
 export class FirebaseService {
 
-  firestore = inject(AngularFirestore);
   utilsSvc = inject(UtilsService);
 
   constructor() { }
