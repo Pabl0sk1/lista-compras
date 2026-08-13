@@ -29,9 +29,9 @@
                 "output": "assets"
               },
               {
-                "glob": "**/*.svg",
-                "input": "node_modules/ionicons/dist/ionicons/svg",
-                "output": "./svg"
+                "glob": "**/*",
+                "input": "node_modules/ionicons/dist/ionicons",
+                "output": "assets/ionicons"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
@@ -108,9 +108,9 @@
                 "output": "assets"
               },
               {
-                "glob": "**/*.svg",
-                "input": "node_modules/ionicons/dist/ionicons/svg",
-                "output": "./svg"
+                "glob": "**/*",
+                "input": "node_modules/ionicons/dist/ionicons",
+                "output": "assets/ionicons"
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],

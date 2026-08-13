@@ -1,0 +1,68 @@
+rules_version = '2';
+
+// Modelo de datos:
+//   users/{uid}                -> perfil del usuario
+//   users/{uid}/lists/{listId} -> listas de compra de ese usuario
+//
+// Regla base: un usuario solo puede leer y escribir SU propio subárbol,
+// y solo si verificó su correo (la app ya lo exige al iniciar sesión).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Sesión iniciada como ese usuario (puede no haber verificado el correo todavía)
+    function isSignedInAs(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // Dueño del subárbol Y con el correo verificado
+    function isOwner(uid) {
+      return isSignedInAs(uid) && request.auth.token.email_verified == true;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // El perfil no puede contener contraseñas ni suplantar a otro usuario
+    function validProfile(uid) {
+      return incoming().keys().hasOnly(['uid', 'email', 'name'])
+        && incoming().uid == uid
+        && incoming().email is string
+        && incoming().email == request.auth.token.email
+        && incoming().name is string
+        && incoming().name.size() >= 4
+        && incoming().name.size() <= 50;
+    }
+
+    function validList() {
+      return incoming().keys().hasOnly(['id', 'title', 'status', 'dateHour', 'items'])
+        && incoming().title is string
+        && incoming().title.size() > 0
+        && incoming().title.size() <= 100
+        && incoming().status in ['Activo', 'Completo']
+        && incoming().dateHour is string
+        && incoming().dateHour.size() <= 40
+        && incoming().items is list
+        && incoming().items.size() <= 200;
+    }
+
+    match /users/{uid} {
+      allow get, list: if isOwner(uid);
+      // El registro crea el perfil antes de verificar el correo
+      allow create: if isSignedInAs(uid) && validProfile(uid);
+      allow update: if isOwner(uid) && validProfile(uid);
+      allow delete: if isOwner(uid);
+
+      match /lists/{listId} {
+        allow read: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validList();
+        allow delete: if isOwner(uid);
+      }
+    }
+
+    // Todo lo demás queda cerrado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
