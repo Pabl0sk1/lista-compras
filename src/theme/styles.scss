@@ -391,6 +391,61 @@ ion-toast {
   font-weight: 500;
 }
 
+// ---------- Selector de fecha y hora ----------
+// Ionic no lo pinta solo con nuestra paleta: hay que darle superficie y
+// colores. --background-rgb es clave: es lo que usa el degradado que difumina
+// los extremos de las ruedas de la hora, y con el valor claro por defecto
+// dejaba un borrón blanco encima del tema oscuro.
+ion-datetime {
+  --background: var(--se-superficie);
+  --background-rgb: var(--se-superficie-rgb);
+  --title-color: var(--se-texto);
+  --wheel-highlight-background: var(--se-superficie-alt);
+  --wheel-fade-background-rgb: var(--se-superficie-rgb);
+
+  border-radius: var(--se-radio);
+  color: var(--se-texto);
+
+  &::part(calendar-day) {
+    color: var(--se-texto);
+  }
+
+  // Días de otros meses y fuera de rango
+  &::part(calendar-day disabled) {
+    color: var(--se-texto-suave);
+    opacity: .45;
+  }
+
+  &::part(calendar-day today) {
+    border-color: var(--ion-color-primary);
+  }
+
+  &::part(calendar-day active),
+  &::part(calendar-day active today) {
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+  }
+}
+
+// El contenedor que envuelve al selector tiene su propio fondo, que se veía
+// blanco por detrás del calendario
+.modal-fecha {
+  --background: var(--se-superficie);
+  --border-radius: var(--se-radio);
+  --box-shadow: var(--se-sombra-alta);
+  --width: fit-content;
+  --height: fit-content;
+
+  ion-datetime {
+    --background: var(--se-superficie);
+  }
+}
+
+ion-datetime-button::part(native) {
+  background: var(--se-superficie-alt);
+  color: var(--se-texto);
+}
+
 // ---------- Modal ----------
 .add-update-modal {
   --height: 92%;

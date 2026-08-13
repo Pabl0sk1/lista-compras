@@ -37,6 +37,7 @@
   // ---- Superficies (se redefinen en oscuro) ----
   --se-fondo: var(--se-gris-50);
   --se-superficie: #FFFFFF;
+  --se-superficie-rgb: 255, 255, 255;
   --se-superficie-alt: var(--se-gris-100);
   --se-borde: var(--se-gris-200);
   --se-texto: var(--se-gris-900);
@@ -122,6 +123,31 @@
   --ion-card-background: var(--se-superficie);
 
   --ion-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  // ---- Escala de pasos de Ionic ----
+  // Son mezclas entre el fondo y el texto. Componentes como ion-datetime las
+  // usan para sus grises internos; al escribir paleta propia en vez de
+  // importar la de Ionic, esta escala se quedaba en claro y el calendario
+  // salia ilegible en modo oscuro.
+  --ion-color-step-50:  #ECEFF2;
+  --ion-color-step-100: #E1E3E7;
+  --ion-color-step-150: #D5D8DD;
+  --ion-color-step-200: #C9CDD2;
+  --ion-color-step-250: #BEC1C8;
+  --ion-color-step-300: #B2B6BD;
+  --ion-color-step-350: #A6ABB2;
+  --ion-color-step-400: #9B9FA8;
+  --ion-color-step-450: #8F949E;
+  --ion-color-step-500: #838893;
+  --ion-color-step-550: #787D88;
+  --ion-color-step-600: #6C727E;
+  --ion-color-step-650: #616673;
+  --ion-color-step-700: #555B69;
+  --ion-color-step-750: #49505E;
+  --ion-color-step-800: #3E4454;
+  --ion-color-step-850: #323949;
+  --ion-color-step-900: #262E3F;
+  --ion-color-step-950: #1B2234;
 }
 
 // ============================================================================
@@ -135,6 +161,7 @@
 @mixin tokens-oscuro {
     --se-fondo: #0B1120;
     --se-superficie: #131C2E;
+    --se-superficie-rgb: 19, 28, 46;
     --se-superficie-alt: #1B2739;
     --se-borde: #26334A;
     --se-texto: #E8EDF5;
@@ -200,6 +227,27 @@
 
     --ion-item-background: var(--se-superficie);
     --ion-card-background: var(--se-superficie);
+
+    // La escala invertida: del fondo oscuro hacia el texto claro
+    --ion-color-step-50:  #161C2B;
+    --ion-color-step-100: #212735;
+    --ion-color-step-150: #2C3240;
+    --ion-color-step-200: #373D4B;
+    --ion-color-step-250: #424855;
+    --ion-color-step-300: #4D5360;
+    --ion-color-step-350: #585E6B;
+    --ion-color-step-400: #636975;
+    --ion-color-step-450: #6E7480;
+    --ion-color-step-500: #7A7F8B;
+    --ion-color-step-550: #858A95;
+    --ion-color-step-600: #9095A0;
+    --ion-color-step-650: #9BA0AA;
+    --ion-color-step-700: #A6ABB5;
+    --ion-color-step-750: #B1B6C0;
+    --ion-color-step-800: #BCC1CA;
+    --ion-color-step-850: #C7CCD5;
+    --ion-color-step-900: #D2D7E0;
+    --ion-color-step-950: #DDE2EA;
 }
 
 // 1. Preferencia del sistema, salvo que el usuario haya forzado claro

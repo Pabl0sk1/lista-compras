@@ -12,7 +12,7 @@
 <div *ngIf="type === 'datetime-local'" class="campo-fecha">
   <span class="campo-fecha__etiqueta">Fecha y hora</span>
   <ion-datetime-button datetime="datetime"></ion-datetime-button>
-  <ion-modal [keepContentsMounted]="true">
+  <ion-modal class="modal-fecha" [keepContentsMounted]="true">
     <ng-template>
       <ion-datetime id="datetime" [formControl]="control" locale="es-ES" presentation="date-time"
         [showDefaultButtons]="true" doneText="Listo" cancelText="Cancelar"></ion-datetime>
