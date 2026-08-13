@@ -39,6 +39,18 @@
       <p class="perfil__ayuda" *ngIf="tema === 'system'">Sigue la configuración de tu dispositivo.</p>
     </section>
 
+    <p class="perfil__etiqueta">Aplicación</p>
+    <section class="perfil__grupo">
+      <button class="perfil__accion" (click)="instalarApp()" [disabled]="pwaSvc.instalada">
+        <ion-icon [name]="pwaSvc.instalada ? 'checkmark-circle-outline' : 'download-outline'"></ion-icon>
+        <span>{{pwaSvc.instalada ? 'App instalada' : 'Instalar aplicación'}}</span>
+        <ion-icon class="perfil__flecha" name="chevron-forward" *ngIf="!pwaSvc.instalada"></ion-icon>
+      </button>
+    </section>
+    <p class="perfil__ayuda perfil__ayuda--izq" *ngIf="!pwaSvc.instalada">
+      Añádela a tu pantalla de inicio o escritorio y se abrirá como una app, sin barra del navegador.
+    </p>
+
     <p class="perfil__etiqueta">Cuenta</p>
     <section class="perfil__grupo">
       <button class="perfil__accion" (click)="editProfile()">

@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ThemeService } from './services/theme.service';
+import { PwaService } from './services/pwa.service';
 
 @Component({
   selector: 'app-root',
@@ -12,5 +13,9 @@ export class AppComponent {
   constructor() {
     // Con el tema en "Sistema", seguir los cambios del sistema en caliente
     inject(ThemeService).escucharSistema();
+
+    // Hay que escuchar desde el arranque: el evento de instalación se dispara
+    // una sola vez y muy pronto, mucho antes de que se abra el perfil.
+    inject(PwaService).escuchar();
   }
 }

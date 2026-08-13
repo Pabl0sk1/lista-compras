@@ -304,6 +304,22 @@ ion-button {
     color: var(--ion-color-success);
     background: rgba(var(--ion-color-success-rgb), .12);
   }
+
+  // Su hora ya pasó y sigue activa
+  &.vencida {
+    color: var(--ion-color-danger);
+    background: rgba(var(--ion-color-danger-rgb), .12);
+    gap: 5px;
+
+    // Aquí el punto sobra: ya hay un icono de alarma
+    &::before {
+      display: none;
+    }
+
+    ion-icon {
+      font-size: 13px;
+    }
+  }
 }
 
 // ---------- Diálogos ----------

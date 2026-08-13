@@ -6,6 +6,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { EditProfileComponent } from 'src/app/shared/components/edit-profile/edit-profile.component';
 import { ChangePasswordComponent } from 'src/app/shared/components/change-password/change-password.component';
 import { Tema, ThemeService } from 'src/app/services/theme.service';
+import { PwaService } from 'src/app/services/pwa.service';
 import { orderBy } from '@angular/fire/firestore';
 import { deleteUser } from '@angular/fire/auth';
 
@@ -23,6 +24,7 @@ export class ProfilePage implements OnInit {
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
   themeSvc = inject(ThemeService);
+  pwaSvc = inject(PwaService);
 
   @ViewChild('selectorFoto') selectorFoto!: ElementRef<HTMLInputElement>;
 
@@ -50,6 +52,29 @@ export class ProfilePage implements OnInit {
 
   cambiarTema(event: CustomEvent) {
     this.themeSvc.setTema(event.detail.value as Tema);
+  }
+
+  // ---- Instalación de la app ----
+  async instalarApp() {
+    if (this.pwaSvc.instalada) return;
+
+    const resultado = await this.pwaSvc.instalar();
+    if (resultado === 'aceptada') {
+      return this.avisar('App instalada. Búscala en tu pantalla de inicio.', 'success');
+    }
+    if (resultado === 'rechazada') return;
+
+    // El navegador no ofrece el diálogo (iOS, Firefox, o ya se descartó antes):
+    // solo queda explicar los pasos.
+    this.utilsSvc.presentAlert({
+      header: 'Instalar ShopEasy',
+      message: this.pwaSvc.esIOS
+        ? 'En iPhone o iPad: toca el botón <b>Compartir</b> y luego <b>Añadir a pantalla de inicio</b>.'
+        : 'Abre el menú de tu navegador (⋮) y elige <b>Instalar aplicación</b> o <b>Añadir a pantalla de inicio</b>.',
+      cssClass: 'custom-alert',
+      mode: 'ios',
+      buttons: [{ text: 'Entendido', cssClass: 'logout-button' }]
+    });
   }
 
   // ---- Foto de perfil ----

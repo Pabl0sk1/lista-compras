@@ -37,6 +37,36 @@ export class HomePage implements OnInit {
     return this.user = await this.firebaseSvc.ensureLocalUser() ?? {} as User;
   }
 
+  /**
+   * Una lista "toca hacerla" cuando su fecha ya pasó y sigue activa.
+   * Las completas no avisan aunque su fecha sea vieja: ya no hay nada que hacer.
+   */
+  esVencida(list: List): boolean {
+    if (list.status !== 'Activo') return false;
+    const fecha = this.aFecha(list.dateHour);
+    return !!fecha && fecha.getTime() <= Date.now();
+  }
+
+  get vencidas(): List[] {
+    return this.lists.filter(l => this.esVencida(l));
+  }
+
+  /**
+   * Ordena por urgencia real, no por fecha de creación: primero lo que ya
+   * tocaba (lo más atrasado arriba), luego lo próximo, y al final lo completo.
+   */
+  private ordenarPorUrgencia(lists: List[]): List[] {
+    const peso = (l: List) => this.esVencida(l) ? 0 : (l.status === 'Activo' ? 1 : 2);
+    const tiempo = (l: List) => this.aFecha(l.dateHour)?.getTime() ?? 0;
+
+    return [...lists].sort((a, b) => {
+      const pa = peso(a), pb = peso(b);
+      if (pa !== pb) return pa - pb;
+      // Dentro del mismo grupo: lo más cercano en el tiempo primero
+      return peso(a) === 2 ? tiempo(b) - tiempo(a) : tiempo(a) - tiempo(b);
+    });
+  }
+
   /** Saludo según la hora del día */
   saludo(): string {
     const hora = new Date().getHours();
@@ -55,6 +85,14 @@ export class HomePage implements OnInit {
   resumen(): string {
     if (this.loading) return 'Cargando tus listas…';
     if (!this.lists.length) return 'Aún no tienes ninguna lista';
+
+    // Lo que ya tocaba manda sobre el resto del resumen
+    const vencidas = this.vencidas.length;
+    if (vencidas) {
+      return vencidas === 1
+        ? 'Tienes 1 lista que ya toca hacer'
+        : `Tienes ${vencidas} listas que ya tocan`;
+    }
 
     const activas = this.lists.filter(l => l.status === 'Activo').length;
     if (!activas) {
@@ -147,7 +185,7 @@ export class HomePage implements OnInit {
 
     let sub = this.firebaseSvc.getSubcollection(path, query).subscribe({
       next: (res: List[]) => {
-        this.lists = res;
+        this.lists = this.ordenarPorUrgencia(res);
         this.loading = false;
         sub.unsubscribe();
       },

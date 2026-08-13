@@ -45,6 +45,12 @@
   }
 }
 
+// Franja roja a la izquierda: se distingue el "ya toca" sin leer nada
+.lista-card--vencida {
+  border-color: rgba(var(--ion-color-danger-rgb), .35);
+  box-shadow: inset 3px 0 0 var(--ion-color-danger), var(--se-sombra);
+}
+
 .lista-card__texto {
   flex: 1;
   min-width: 0;

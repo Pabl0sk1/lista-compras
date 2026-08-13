@@ -25,7 +25,7 @@ export class AddUpdateListComponent implements OnInit {
     id: new FormControl(''),
     title: new FormControl('', [Validators.required, Validators.maxLength(100)]),
     status: new FormControl(ListStatus.Active, [Validators.required]),
-    dateHour: new FormControl(this.formatDate(Timestamp.now()), [Validators.required]),
+    dateHour: new FormControl(this.proximaHora(), [Validators.required]),
     items: new FormControl([])
   })
 
@@ -72,35 +72,42 @@ export class AddUpdateListComponent implements OnInit {
   formatDate(dateHour: any): string {
     if (!dateHour) return '';
 
-    // Si es un Timestamp de Firebase
-    if (dateHour instanceof Timestamp) {
-      let localDate = dateHour.toDate();
-      localDate.setHours(localDate.getHours() - 3); // Restar 3 horas
-      return this.formatToISO8601(localDate);
-    }
+    // Timestamp de Firebase
+    if (dateHour instanceof Timestamp) return this.formatToISO8601(dateHour.toDate());
 
-    // Si es un objeto con `seconds` (Firestore lo devuelve así en algunas ocasiones)
+    // Objeto con `seconds` (Firestore lo devuelve así en algunas ocasiones)
     if (typeof dateHour === 'object' && dateHour.seconds) {
-      let localDate = new Date(dateHour.seconds * 1000);
-      localDate.setHours(localDate.getHours() - 3); // Restar 3 horas
-      return this.formatToISO8601(localDate);
+      return this.formatToISO8601(new Date(dateHour.seconds * 1000));
     }
 
-    // Si es un string, intentar convertirlo a fecha
+    // Cadena ya guardada
     if (typeof dateHour === 'string') {
-      let parsedDate = new Date(dateHour);
-      if (!isNaN(parsedDate.getTime())) {
-        parsedDate.setHours(parsedDate.getHours() - 3); // Restar 3 horas
-        return this.formatToISO8601(parsedDate);
-      }
+      const parsedDate = new Date(dateHour);
+      if (!isNaN(parsedDate.getTime())) return this.formatToISO8601(parsedDate);
     }
 
     return '';
   }
 
+  /**
+   * Formatea en hora LOCAL para el input datetime-local.
+   *
+   * Antes esto usaba toISOString() (que convierte a UTC) y compensaba restando
+   * 3 horas a mano. Cuadraba en Paraguay (UTC-3) y en ningún otro sitio, y se
+   * descuadra con los cambios de horario. Con avisos por fecha, una hora
+   * desplazada significa avisar cuando no toca.
+   */
   formatToISO8601(date: Date): string {
-    // Convertir la fecha a formato ISO 8601: YYYY-MM-DDTHH:mm:ss
-    return date.toISOString().slice(0, 16); // Recorta la cadena para que sea del tipo YYYY-MM-DDTHH:mm
+    const dosCifras = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${dosCifras(date.getMonth() + 1)}-${dosCifras(date.getDate())}`
+      + `T${dosCifras(date.getHours())}:${dosCifras(date.getMinutes())}`;
+  }
+
+  /** Próxima hora en punto: una lista nueva no debería nacer ya vencida */
+  private proximaHora(): string {
+    const d = new Date();
+    d.setHours(d.getHours() + 1, 0, 0, 0);
+    return this.formatToISO8601(d);
   }
 
   createList() {

@@ -14,13 +14,22 @@
         <p>{{resumen()}}</p>
       </header>
 
-      <article class="lista-card" *ngFor="let list of lists" (click)="addOrUpdateList(list)">
+      <article class="lista-card" [class.lista-card--vencida]="esVencida(list)" *ngFor="let list of lists"
+        (click)="addOrUpdateList(list)">
         <div class="lista-card__texto">
           <h3 class="lista-card__titulo">{{list.title}}</h3>
 
           <div class="lista-card__meta">
-            <span class="se-chip" [class.activo]="list.status === 'Activo'"
-              [class.completo]="list.status === 'Completo'">{{list.status}}</span>
+            <!-- Cuando la hora ya llegó, el aviso sustituye al estado: es lo
+                 que de verdad interesa saber de un vistazo. -->
+            <span class="se-chip vencida" *ngIf="esVencida(list); else estadoNormal">
+              <ion-icon name="alarm-outline" aria-hidden="true"></ion-icon>
+              Ya toca
+            </span>
+            <ng-template #estadoNormal>
+              <span class="se-chip" [class.activo]="list.status === 'Activo'"
+                [class.completo]="list.status === 'Completo'">{{list.status}}</span>
+            </ng-template>
             <span class="lista-card__fecha" *ngIf="list?.dateHour">{{formatDate(list.dateHour)}}</span>
           </div>
 
