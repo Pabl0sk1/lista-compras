@@ -21,10 +21,10 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # Angular 20 exige node ^20.19 || ^22.12 || >=24. Sin esto se usa la
       # version que traiga la imagen del runner, que cambia sin avisar.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
