@@ -5,3 +5,34 @@
   font-weight: 700;
   letter-spacing: -0.01em;
 }
+
+// ---- Cabecera de marca ----
+.se-toolbar--marca {
+  --min-height: 60px;
+}
+
+.se-marca {
+  display: flex;
+  align-items: center;
+  padding-inline-start: 16px;
+  color: var(--ion-toolbar-color);
+
+  // Sobre la barra verde el acento verde del logo se perdería, así que la
+  // marca va monocroma; en oscuro la barra es superficie y el verde luce.
+  --logo-accent: currentColor;
+}
+
+:host-context(:root[data-tema="dark"]) .se-marca {
+  --logo-accent: var(--se-green-400);
+}
+
+@media (prefers-color-scheme: dark) {
+  :host-context(:root:not([data-tema="light"])) .se-marca {
+    --logo-accent: var(--se-green-400);
+  }
+}
+
+// Cuando hay botón atrás o de cerrar, la marca no necesita el margen inicial
+ion-buttons[slot="start"]:not(:empty) + .se-marca {
+  padding-inline-start: 4px;
+}

@@ -12,6 +12,9 @@ export class HeaderComponent implements OnInit {
   utilsSvc = inject(UtilsService);
 
   @Input() title!: String;
+
+  /** Muestra la marca en vez del título (cabeceras de dentro de la app) */
+  @Input() brand = false;
   @Input() backButton!: String;
   @Input() isModal!: boolean;
 

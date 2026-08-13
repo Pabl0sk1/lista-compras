@@ -1,8 +1,14 @@
-<app-header backButton="/auth" title="Registro"></app-header>
 <ion-content>
+  <button class="auth-volver" routerLink="/auth" type="button">
+    <ion-icon name="arrow-back" aria-label="Volver"></ion-icon>
+  </button>
   <div class="d-flex-center">
     <form [formGroup]="form" class="auth-form" (ngSubmit)="submit()" (keypress.enter)="submit()">
-      <app-logo></app-logo>
+      <div class="auth-cabecera auth-cabecera--compacta">
+        <app-logo size="md"></app-logo>
+        <h1 class="auth-titulo">Crear cuenta</h1>
+        <p class="auth-sub">Rellena tus datos y te enviaremos un correo para verificar la cuenta.</p>
+      </div>
 
       <app-custom-input icon="person-outline" autocomplete="name" [control]="form.controls.name" type="text"
         label="Nombre"></app-custom-input>

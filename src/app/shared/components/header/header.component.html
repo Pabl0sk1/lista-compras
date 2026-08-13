@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar class="se-toolbar">
+  <ion-toolbar class="se-toolbar" [class.se-toolbar--marca]="brand">
 
     <ion-buttons slot="start">
       <ion-button shape="round" (click)="dismissModal()" *ngIf="isModal">
@@ -9,7 +9,12 @@
       <ion-back-button *ngIf="backButton" [defaultHref]="backButton" text=""></ion-back-button>
     </ion-buttons>
 
-    <ion-title class="title-head">{{title}}</ion-title>
+    <!-- Dentro de la app la cabecera lleva la marca; en los modales, el título
+         de la acción, que es lo que da contexto ahí. -->
+    <div class="se-marca" *ngIf="brand">
+      <app-logo size="sm"></app-logo>
+    </div>
+    <ion-title class="title-head" *ngIf="!brand">{{title}}</ion-title>
 
   </ion-toolbar>
 </ion-header>

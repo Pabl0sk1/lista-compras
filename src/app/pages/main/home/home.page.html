@@ -1,4 +1,4 @@
-<app-header title="Inicio"></app-header>
+<app-header [brand]="true"></app-header>
 <ion-content [scrollY]="!loading">
   <!--Refrescar página-->
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">

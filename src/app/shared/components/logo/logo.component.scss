@@ -3,7 +3,9 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  color: var(--se-texto);
+  // Hereda el color de donde se coloque: oscuro sobre el contenido, blanco
+  // sobre la barra verde de la cabecera. Fijarlo aquí lo dejaba ilegible ahí.
+  color: inherit;
 }
 
 .se-logo__marca {
@@ -37,11 +39,12 @@
 }
 
 // ---- Tamaños ----
+// Horizontal y compacto: pensado para caber en una barra de cabecera
 .se-logo--sm {
-  --marca: 40px;
-  --nombre: 19px;
+  --marca: 28px;
+  --nombre: 18px;
   flex-direction: row;
-  gap: 10px;
+  gap: 9px;
 }
 
 .se-logo--md {
