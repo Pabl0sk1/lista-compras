@@ -1,5 +1,5 @@
 <ion-content>
-  <app-header [isModal]=true color="dark" title="Editar Perfil"></app-header>
+  <app-header [isModal]="true" title="Editar Perfil"></app-header>
 
   <app-custom-input-list [control]="form.controls.name" type="text" label="Nombre"></app-custom-input-list>
   <div class="validators" *ngIf="form.controls.name.errors && form.controls.name.touched">

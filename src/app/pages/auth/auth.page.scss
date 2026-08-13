@@ -1,0 +1,21 @@
+.auth-cabecera {
+  padding: 28px 0 32px;
+}
+
+// Separador "o" entre iniciar sesión y crear cuenta
+.auth-separador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 16px;
+  color: var(--se-texto-suave);
+  font-size: 13px;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--se-borde);
+  }
+}

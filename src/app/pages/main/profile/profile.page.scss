@@ -1,23 +1,128 @@
-.avatar {
-  font-size: 130px;
-  margin-top: 60px;
+.perfil {
+  padding: 20px 16px 40px;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
-ion-button {
-  margin-top: 50px;
+// ---- Tarjeta de identidad ----
+.perfil__tarjeta {
+  text-align: center;
+  padding: 28px 20px 26px;
+  background: var(--se-superficie);
+  border: 1px solid var(--se-borde);
+  border-radius: var(--se-radio-lg);
+  box-shadow: var(--se-sombra);
 }
 
-.email {
-  font-style: italic;
-  font-size: large;
-  margin-bottom: 15px;
+.perfil__avatar {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(160deg, var(--se-green-500), var(--se-green-700));
+  color: #fff;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
 }
 
-h2 {
-  font-weight: bolder;
-  font-size: xx-large;
+.perfil__nombre {
+  margin: 0 0 4px;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--se-texto);
 }
 
-ion-item {
-  --padding-top: 15px;
+.perfil__email {
+  margin: 0;
+  font-size: 14px;
+  color: var(--se-texto-suave);
+  word-break: break-all;
+}
+
+// ---- Grupos de acciones ----
+.perfil__etiqueta {
+  margin: 26px 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--se-texto-suave);
+}
+
+.perfil__grupo {
+  margin-top: 20px;
+  background: var(--se-superficie);
+  border: 1px solid var(--se-borde);
+  border-radius: var(--se-radio);
+  overflow: hidden;
+
+  &--peligro {
+    margin-top: 0;
+    border-color: rgba(var(--ion-color-danger-rgb), .28);
+  }
+}
+
+.perfil__accion {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--se-borde);
+  font-size: 15.5px;
+  font-weight: 500;
+  color: var(--se-texto);
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s ease;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  &:hover {
+    background: var(--se-superficie-alt);
+  }
+
+  span {
+    flex: 1;
+  }
+
+  ion-icon {
+    font-size: 21px;
+    color: var(--se-texto-suave);
+    flex: none;
+  }
+
+  .perfil__flecha {
+    font-size: 16px;
+    opacity: .5;
+  }
+
+  &.peligro {
+    color: var(--ion-color-danger);
+    border-top-color: rgba(var(--ion-color-danger-rgb), .18);
+
+    ion-icon {
+      color: var(--ion-color-danger);
+    }
+
+    &:hover {
+      background: rgba(var(--ion-color-danger-rgb), .07);
+    }
+  }
+}
+
+.perfil__pie {
+  margin: 32px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--se-texto-suave);
+  opacity: .7;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-logo',
@@ -6,10 +6,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./logo.component.scss'],
   standalone: false
 })
-export class LogoComponent  implements OnInit {
+export class LogoComponent {
 
-  constructor() { }
+  /** sm: horizontal, para cabeceras · md: por defecto · lg: pantallas de bienvenida */
+  @Input() size: 'sm' | 'md' | 'lg' = 'md';
 
-  ngOnInit() {}
-
+  /** Muestra el lema bajo el nombre */
+  @Input() tagline = false;
 }

@@ -35,7 +35,7 @@
         <div *ngIf="form.controls.confirmPassword.errors?.['passwordMismatch']">Las contraseñas no coinciden.</div>
       </div>
 
-      <ion-button color="dark" expand="block" mode="ios" class="submit" type="submit" [disabled]="form.invalid">
+      <ion-button color="primary" expand="block" mode="ios" class="submit" type="submit" [disabled]="form.invalid">
         Registrarse
         <ion-icon slot="end" name="person-add-outline"></ion-icon>
       </ion-button>

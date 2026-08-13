@@ -1,18 +1,28 @@
-ion-item {
-  transition: border-color 0.3s ease-in-out;
-  --border-color: #555555;
-  --inner-padding-start: 16px;
-  --inner-padding-end: 16px;
-  --padding-start: 0;
-  --padding-end: 0;
-  --padding-top: 0;
-  --padding-bottom: 0;
+.campo-fecha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: var(--se-superficie);
+  border: 1px solid var(--se-borde);
+  border-radius: var(--se-radio);
 }
 
-ion-datetime {
-  --background: #a9f997;
-  --background-rgb: 255, 241, 242;
+.campo-fecha__etiqueta {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--se-texto-suave);
+}
 
-  border-radius: 8px;
-  box-shadow: rgba(var(--ion-color-success-rgb), 0.3) 0px 10px 15px -3px;
+ion-datetime-button {
+  --ion-color-base: transparent;
+
+  &::part(native) {
+    background: var(--se-superficie-alt);
+    border-radius: var(--se-radio-sm);
+    color: var(--se-texto);
+    font-weight: 600;
+  }
 }

@@ -37,6 +37,16 @@ export class HomePage implements OnInit {
     return this.user = await this.firebaseSvc.ensureLocalUser() ?? {} as User;
   }
 
+  /** Items marcados de una lista */
+  getCompletados(list: List): number {
+    return list.items?.filter(item => item.completed).length ?? 0;
+  }
+
+  /** Porcentaje completado, para la barra de progreso de la tarjeta */
+  getProgreso(list: List): number {
+    return this.utilsSvc.getPercentaje(list.items ?? []);
+  }
+
   doRefresh(event: { target: { complete: () => void; }; }) {
     setTimeout(() => {
       this.getLists();
@@ -45,41 +55,43 @@ export class HomePage implements OnInit {
   }
 
   formatDate(dateHour: any): string {
-    if (!dateHour) return '';
-    // Si es un Timestamp de Firebase
-    if (dateHour instanceof Timestamp) {
-      return dateHour.toDate().toLocaleString('es-ES', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
-    }
+    const fecha = this.aFecha(dateHour);
+    if (!fecha) return '';
 
-    // Si es un objeto con `seconds` (Firestore lo devuelve así en algunas ocasiones)
-    if (typeof dateHour === 'object' && dateHour.seconds) {
-      return new Date(dateHour.seconds * 1000).toLocaleString('es-ES', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
-    }
+    // Fechas cercanas en palabras; el resto, corto y sin año si es el actual
+    const dia = new Date(fecha); dia.setHours(0, 0, 0, 0);
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const dias = Math.round((dia.getTime() - hoy.getTime()) / 86400000);
 
-    // Si es un string, intentar convertirlo a fecha
+    const hora = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    if (dias === 0) return `Hoy, ${hora}`;
+    if (dias === 1) return `Mañana, ${hora}`;
+    if (dias === -1) return `Ayer, ${hora}`;
+
+    return fecha.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      ...(fecha.getFullYear() === new Date().getFullYear() ? {} : { year: 'numeric' })
+    });
+  }
+
+  /** Firestore devuelve la fecha como Timestamp, como {seconds} o como string */
+  private aFecha(dateHour: any): Date | null {
+    if (!dateHour) return null;
+    if (dateHour instanceof Timestamp) return dateHour.toDate();
+    if (typeof dateHour === 'object' && dateHour.seconds) return new Date(dateHour.seconds * 1000);
     if (typeof dateHour === 'string') {
-      let parsedDate = new Date(dateHour);
-      if (!isNaN(parsedDate.getTime())) {
-        return parsedDate.toLocaleString('es-ES', {
-          day: '2-digit', month: '2-digit', year: 'numeric',
-          hour: '2-digit', minute: '2-digit'
-        });
-      }
+      const d = new Date(dateHour);
+      if (!isNaN(d.getTime())) return d;
     }
-    return '';
+    return null;
   }
 
   async confirmDeleteList(list: List) {
     this.utilsSvc.presentAlert({
       header: 'Eliminar Lista',
       message: '¿Deseas eliminar la lista?',
-      cssClass: 'custom-alert',
+      cssClass: 'custom-alert peligro',
       mode: 'ios',
       buttons: [
         {

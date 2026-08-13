@@ -1,101 +1,98 @@
 .body-div {
-  margin-left: 10px;
-  margin-right: 10px;
+  padding: 0 16px 96px;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
-ion-card {
-  border-radius: 4px;
-  padding: 0px;
-  min-height: 80px;
-  margin: 0px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease-in-out;
-  border: 1px solid rgba(0, 0, 0, 0.155);
-}
-
-ion-card:hover {
-  cursor: pointer;
-  background: var(--ion-color-light);
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-ion-grid {
-  padding: 0px;
-}
-
-.title {
-  font-size: 20px;
-  font-weight: bolder;
-  padding-top: 10px;
-  line-height: 20px;
-  padding: 0px;
-}
-
-h2 {
-  font-weight: lighter;
-  text-transform: uppercase;
-  font-size: 20px;
-  padding: 5px;
-  letter-spacing: 2px;
-  text-align: center;
-}
-
-.noLoading p {
-  display: inline;
-  margin-right: 10px;
-}
-
-p {
+.lista-card {
   display: flex;
-  justify-content: start;
-  margin: 0px;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: var(--se-superficie);
+  border: 1px solid var(--se-borde);
+  border-radius: var(--se-radio);
+  box-shadow: var(--se-sombra);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+
+  &:hover {
+    box-shadow: var(--se-sombra-alta);
+    border-color: var(--se-gris-300);
+  }
+
+  &:active {
+    transform: scale(.99);
+  }
+}
+
+.lista-card__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.lista-card__titulo {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--se-texto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lista-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.lista-card__fecha {
+  font-size: 12.5px;
+  color: var(--se-texto-suave);
+}
+
+.lista-card__progreso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .se-progreso {
+    flex: 1;
+  }
+}
+
+.lista-card__cuenta {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--se-texto-suave);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+.lista-card__borrar {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  margin: 0;
+  flex: none;
+  height: 40px;
+
+  &:hover ion-icon {
+    color: var(--ion-color-danger) !important;
+  }
 }
 
 ion-skeleton-text {
-  margin-right: 15px;
-  --background: rgba(0, 255, 21, 0.181);
-  --background-rgb: 0, 255, 21;
-}
-
-ion-avatar {
-  margin: 15px;
+  --background-rgb: var(--ion-color-primary-rgb);
 }
 
 ion-refresher-content {
-  --ion-color-primary: rgb(26, 225, 70);
+  --ion-color-primary: var(--ion-color-primary);
 }
 
-.activo {
-  color: var(--ion-color-primary);
-}
-
-.completo {
-  color: var(--ion-color-success);
-}
-
-ion-button {
-  --background: transparent !important;
-  --background-hover: transparent !important;
-  --background-activated: transparent !important;
-  --box-shadow: none !important;
-  margin: 0px;
-}
-
-.card-container {
-  display: flex;
-  justify-content: space-between; /* Separa el contenido y el botón */
-  align-items: center; /* Centra verticalmente */
-  padding: 0px; /* Ajusta el espacio interno del card */
-}
-
-.content {
-  display: flex;
-  width: 100%;
-  justify-content: space-between; /* Separa texto y botón */
-  align-items: center; /* Centra verticalmente */
-}
-
-.content-card {
-  width: 100%;
-  padding: 16px;
+ion-fab-button {
+  --box-shadow: 0 6px 16px rgba(var(--ion-color-primary-rgb), .4);
 }

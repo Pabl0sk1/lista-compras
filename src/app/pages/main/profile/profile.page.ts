@@ -33,6 +33,11 @@ export class ProfilePage implements OnInit {
     return this.user = await this.firebaseSvc.ensureLocalUser() ?? {} as User;
   }
 
+  /** Inicial para el avatar, cuando aún no hay nombre cae al correo */
+  inicial(): string {
+    return (this.user?.name || this.user?.email || '?').trim().charAt(0).toUpperCase();
+  }
+
   //Editar Perfil
   async editProfile() {
     let res = await this.utilsSvc.presentModal({
@@ -46,7 +51,7 @@ export class ProfilePage implements OnInit {
     this.utilsSvc.presentAlert({
       header: 'Eliminar Todas las Listas',
       message: '¿Deseas eliminar todas tus listas?',
-      cssClass: 'custom-alert',
+      cssClass: 'custom-alert peligro',
       mode: 'ios',
       buttons: [
         {
@@ -141,7 +146,7 @@ export class ProfilePage implements OnInit {
     this.utilsSvc.presentAlert({
       header: 'Eliminar Cuenta',
       message: '¿Deseas eliminar su cuenta?',
-      cssClass: 'custom-alert',
+      cssClass: 'custom-alert peligro',
       mode: 'ios',
       buttons: [
         {

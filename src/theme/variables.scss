@@ -1,2 +1,200 @@
-// For information on how to create your own theme, please see:
-// http://ionicframework.com/docs/theming/
+// ============================================================================
+// ShopEasy · Tokens de diseño
+// ----------------------------------------------------------------------------
+// Antes este archivo estaba vacío: la app usaba el azul por defecto de Ionic y
+// el verde de marca aparecía hardcodeado suelto por los componentes. Todo el
+// color vive ahora aquí.
+//
+// Verde de marca. El primario es el tono oscuro (#15803D) porque es el que
+// lleva texto blanco encima (botones, cabecera) y así cumple contraste AA.
+// El brillante (#22C55E) queda para acentos que no llevan texto: progreso,
+// indicadores de estado, el check del logo.
+// ============================================================================
+
+:root {
+  // ---- Escala de marca ----
+  --se-green-50:  #F0FDF4;
+  --se-green-100: #DCFCE7;
+  --se-green-200: #BBF7D0;
+  --se-green-400: #4ADE80;
+  --se-green-500: #22C55E;
+  --se-green-600: #16A34A;
+  --se-green-700: #15803D;
+  --se-green-800: #126A33;
+
+  // ---- Neutros ----
+  --se-gris-50:  #F8FAFC;
+  --se-gris-100: #F1F5F9;
+  --se-gris-200: #E2E8F0;
+  --se-gris-300: #CBD5E1;
+  --se-gris-400: #94A3B8;
+  --se-gris-500: #64748B;
+  --se-gris-600: #475569;
+  --se-gris-700: #334155;
+  --se-gris-800: #1E293B;
+  --se-gris-900: #0F172A;
+
+  // ---- Superficies (se redefinen en oscuro) ----
+  --se-fondo: var(--se-gris-50);
+  --se-superficie: #FFFFFF;
+  --se-superficie-alt: var(--se-gris-100);
+  --se-borde: var(--se-gris-200);
+  --se-texto: var(--se-gris-900);
+  --se-texto-suave: var(--se-gris-500);
+  --se-sombra: 0 1px 2px rgba(15, 23, 42, .06), 0 4px 12px rgba(15, 23, 42, .05);
+  --se-sombra-alta: 0 2px 4px rgba(15, 23, 42, .08), 0 12px 28px rgba(15, 23, 42, .10);
+
+  // ---- Forma y ritmo ----
+  --se-radio: 14px;
+  --se-radio-sm: 10px;
+  --se-radio-lg: 20px;
+
+  // ---- Acento del logo (lo lee logo.svg) ----
+  --logo-accent: var(--se-green-600);
+
+  // ========== Roles de Ionic ==========
+  --ion-color-primary: #15803D;
+  --ion-color-primary-rgb: 21, 128, 61;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #126A33;
+  --ion-color-primary-tint: #16A34A;
+
+  --ion-color-secondary: #0F172A;
+  --ion-color-secondary-rgb: 15, 23, 42;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #0D1421;
+  --ion-color-secondary-tint: #273246;
+
+  --ion-color-success: #16A34A;
+  --ion-color-success-rgb: 22, 163, 74;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #13903F;
+  --ion-color-success-tint: #2DAC5C;
+
+  --ion-color-warning: #D97706;
+  --ion-color-warning-rgb: 217, 119, 6;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #BF6905;
+  --ion-color-warning-tint: #DD851F;
+
+  --ion-color-danger: #DC2626;
+  --ion-color-danger-rgb: 220, 38, 38;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #C22121;
+  --ion-color-danger-tint: #E03C3C;
+
+  --ion-color-medium: #64748B;
+  --ion-color-medium-rgb: 100, 116, 139;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #58667A;
+  --ion-color-medium-tint: #748297;
+
+  --ion-color-light: #F1F5F9;
+  --ion-color-light-rgb: 241, 245, 249;
+  --ion-color-light-contrast: #0F172A;
+  --ion-color-light-contrast-rgb: 15, 23, 42;
+  --ion-color-light-shade: #D4D8DB;
+  --ion-color-light-tint: #F2F6FA;
+
+  --ion-color-dark: #0F172A;
+  --ion-color-dark-rgb: 15, 23, 42;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0D1421;
+  --ion-color-dark-tint: #273246;
+
+  // ---- Superficies de Ionic ----
+  --ion-background-color: var(--se-fondo);
+  --ion-background-color-rgb: 248, 250, 252;
+  --ion-text-color: var(--se-texto);
+  --ion-text-color-rgb: 15, 23, 42;
+
+  --ion-toolbar-background: var(--ion-color-primary);
+  --ion-toolbar-color: #ffffff;
+
+  --ion-item-background: var(--se-superficie);
+  --ion-card-background: var(--se-superficie);
+
+  --ion-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+// ============================================================================
+// Modo oscuro — sigue la preferencia del sistema
+// ============================================================================
+@media (prefers-color-scheme: dark) {
+  :root {
+    --se-fondo: #0B1120;
+    --se-superficie: #131C2E;
+    --se-superficie-alt: #1B2739;
+    --se-borde: #26334A;
+    --se-texto: #E8EDF5;
+    --se-texto-suave: #93A2B8;
+    --se-sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 12px rgba(0, 0, 0, .3);
+    --se-sombra-alta: 0 2px 4px rgba(0, 0, 0, .45), 0 12px 28px rgba(0, 0, 0, .4);
+
+    // En oscuro el verde oscuro no contrasta: se sube a un tono claro y el
+    // texto que va encima pasa a ser oscuro.
+    --logo-accent: var(--se-green-400);
+
+    --ion-color-primary: #4ADE80;
+    --ion-color-primary-rgb: 74, 222, 128;
+    --ion-color-primary-contrast: #05240F;
+    --ion-color-primary-contrast-rgb: 5, 36, 15;
+    --ion-color-primary-shade: #41C371;
+    --ion-color-primary-tint: #5CE18D;
+
+    --ion-color-success: #4ADE80;
+    --ion-color-success-rgb: 74, 222, 128;
+    --ion-color-success-contrast: #05240F;
+    --ion-color-success-contrast-rgb: 5, 36, 15;
+    --ion-color-success-shade: #41C371;
+    --ion-color-success-tint: #5CE18D;
+
+    --ion-color-danger: #F87171;
+    --ion-color-danger-rgb: 248, 113, 113;
+    --ion-color-danger-contrast: #2A0707;
+    --ion-color-danger-contrast-rgb: 42, 7, 7;
+    --ion-color-danger-shade: #DA6363;
+    --ion-color-danger-tint: #F97F7F;
+
+    --ion-color-warning: #FBBF24;
+    --ion-color-warning-rgb: 251, 191, 36;
+    --ion-color-warning-contrast: #2B1B00;
+    --ion-color-warning-contrast-rgb: 43, 27, 0;
+    --ion-color-warning-shade: #DDA820;
+    --ion-color-warning-tint: #FBC53A;
+
+    --ion-color-light: #1B2739;
+    --ion-color-light-rgb: 27, 39, 57;
+    --ion-color-light-contrast: #E8EDF5;
+    --ion-color-light-contrast-rgb: 232, 237, 245;
+    --ion-color-light-shade: #182232;
+    --ion-color-light-tint: #323D4D;
+
+    --ion-color-dark: #E8EDF5;
+    --ion-color-dark-rgb: 232, 237, 245;
+    --ion-color-dark-contrast: #0B1120;
+    --ion-color-dark-contrast-rgb: 11, 17, 32;
+    --ion-color-dark-shade: #CCD1D8;
+    --ion-color-dark-tint: #EAEFF6;
+
+    --ion-background-color: var(--se-fondo);
+    --ion-background-color-rgb: 11, 17, 32;
+    --ion-text-color: var(--se-texto);
+    --ion-text-color-rgb: 232, 237, 245;
+
+    // En oscuro la cabecera no se pinta de verde: sería un bloque de color
+    // demasiado agresivo. Se usa la superficie y el verde queda de acento.
+    --ion-toolbar-background: var(--se-superficie);
+    --ion-toolbar-color: var(--se-texto);
+
+    --ion-item-background: var(--se-superficie);
+    --ion-card-background: var(--se-superficie);
+  }
+}

@@ -1,48 +1,67 @@
+<app-header [isModal]="true" [title]="list ? 'Actualizar lista' : 'Nueva lista'"></app-header>
+
 <ion-content>
-  <app-header [isModal]=true color="dark" [title]="list ? 'Actualizar Lista' : 'Crear Lista'"></app-header>
+  <div class="modal-cuerpo">
 
-  <app-custom-input-list [control]="form.controls.title" type="text" label="Título"></app-custom-input-list>
-  <div class="validators" *ngIf="form.controls.title.errors && form.controls.title.touched">
-    <div *ngIf="form.controls.title.errors?.['required']">El título es obligatorio.</div>
-    <div *ngIf="form.controls.title.errors?.['maxlength']">El título no puede superar los 100 caracteres.</div>
-  </div>
+    <app-custom-input-list [control]="form.controls.title" type="text" label="Título"></app-custom-input-list>
+    <div class="validators" *ngIf="form.controls.title.errors && form.controls.title.touched">
+      <div *ngIf="form.controls.title.errors?.['required']">El título es obligatorio.</div>
+      <div *ngIf="form.controls.title.errors?.['maxlength']">El título no puede superar los 100 caracteres.</div>
+    </div>
 
-  <app-custom-input-list [control]="form.controls.dateHour" type="datetime-local"></app-custom-input-list>
+    <app-custom-input-list [control]="form.controls.dateHour" type="datetime-local"></app-custom-input-list>
 
-  <ion-item class="item-header" lines="none">
-    <ion-label>Items</ion-label>
-    <span slot="end" *ngIf="tempItems.length">{{getPercentaje()}}%</span>
-    <ion-button color="success" mode="ios" slot="end" (click)="createItem()">
-      <ion-icon name="add-circle-outline"></ion-icon>
-    </ion-button>
-  </ion-item>
+    <!-- Cabecera de items con progreso -->
+    <div class="items-cabecera">
+      <div class="items-cabecera__fila">
+        <h3>Items</h3>
+        <span class="items-cabecera__cuenta" *ngIf="tempItems.length">
+          {{getCompletados()}} de {{tempItems.length}}
+        </span>
+        <ion-button fill="clear" shape="round" (click)="createItem()" aria-label="Añadir item">
+          <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+        </ion-button>
+      </div>
 
-  <ion-range [value]="getPercentaje()"></ion-range>
+      <!-- Barra de solo lectura: antes era un ion-range arrastrable, así que
+           el progreso se podía "mover" a mano sin marcar nada. -->
+      <div class="se-progreso" *ngIf="tempItems.length" [class.completo]="getPercentaje() === 100">
+        <span [style.width.%]="getPercentaje()"></span>
+      </div>
+    </div>
 
-  <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
-    <div *ngFor="let item of tempItems; index as i">
-      <ion-item lines="none">
-        <ion-checkbox class="custom-checkbox" mode="ios" slot="start" [checked]="item.completed"
-          (ionChange)="toggleItemCompleted(i, $event)"></ion-checkbox>
-
-        <ion-label class="ion-text-wrap">{{item.name}}</ion-label>
+    <!-- Items -->
+    <ion-reorder-group class="items-lista" [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
+      <ion-item class="item-fila" lines="none" *ngFor="let item of tempItems; index as i">
+        <ion-checkbox class="custom-checkbox" mode="ios" slot="start" labelPlacement="end" justify="start"
+          [checked]="item.completed" (ionChange)="toggleItemCompleted(i, $event)">
+          <span class="item-nombre" [class.hecho]="item.completed">{{item.name}}</span>
+        </ion-checkbox>
 
         <ion-buttons slot="end">
-          <ion-button (click)="removeItem(i)" shape="round">
-            <ion-icon name="trash-outline"></ion-icon>
+          <ion-button (click)="removeItem(i)" shape="round" aria-label="Quitar item">
+            <ion-icon slot="icon-only" name="close" color="medium"></ion-icon>
           </ion-button>
+          <!-- El asa va en la misma fila; antes ocupaba una fila extra por item -->
+          <ion-reorder class="item-asa"></ion-reorder>
         </ion-buttons>
       </ion-item>
+    </ion-reorder-group>
 
-      <ion-item class="item-reorder line-item">
-        <ion-reorder slot="end"></ion-reorder>
-      </ion-item>
+    <!-- Sin items -->
+    <div class="empty" *ngIf="!tempItems.length">
+      <div class="empty-icono">
+        <ion-icon name="list-outline"></ion-icon>
+      </div>
+      <h3>Esta lista está vacía</h3>
+      <p>Añade lo que necesitas comprar con el botón <strong>+</strong>.</p>
     </div>
-  </ion-reorder-group>
-</ion-content>
-<ion-footer>
-  <div class="ion-text-center">
-    <ion-button color="success" class="ion-margin" mode="ios" [disabled]="form.invalid || !tempItems.length"
-      (click)="submit()" shape="round">Guardar</ion-button>
   </div>
+</ion-content>
+
+<ion-footer class="modal-pie">
+  <ion-button expand="block" mode="ios" color="primary" [disabled]="form.invalid || !tempItems.length"
+    (click)="submit()">
+    {{list ? 'Guardar cambios' : 'Crear lista'}}
+  </ion-button>
 </ion-footer>

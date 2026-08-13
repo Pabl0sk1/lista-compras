@@ -1,5 +1,7 @@
+// El color lo pone .se-toolbar desde los tokens: en claro la cabecera es
+// verde con texto blanco, en oscuro es superficie con texto claro.
 .title-head {
-  font-size: 22px;
-  font-weight: bolder;
-  color: rgb(26, 225, 70);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }

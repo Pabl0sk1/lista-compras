@@ -163,6 +163,11 @@ export class AddUpdateListComponent implements OnInit {
     return this.utilsSvc.getPercentaje(this.tempItems);
   }
 
+  /** Items marcados, para el "3 de 8" de la cabecera */
+  getCompletados(): number {
+    return this.tempItems.filter(item => item.completed).length;
+  }
+
   handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
     const fromIndex = event.detail.from;
     const toIndex = event.detail.to;

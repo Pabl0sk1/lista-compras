@@ -1,12 +1,12 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar color="dark">
+  <ion-toolbar class="se-toolbar">
 
     <ion-buttons slot="start">
-      <ion-button shape="round" (click)="dismissModal()" *ngIf="isModal">
-        <ion-icon name="close-circle-outline"></ion-icon>
+      <ion-button shape="round" (click)="dismissModal()" *ngIf="isModal" aria-label="Cerrar">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>
 
-      <ion-back-button *ngIf="backButton" [defaultHref]="backButton"></ion-back-button>
+      <ion-back-button *ngIf="backButton" [defaultHref]="backButton" text=""></ion-back-button>
     </ion-buttons>
 
     <ion-title class="title-head">{{title}}</ion-title>

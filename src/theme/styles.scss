@@ -1,158 +1,346 @@
+// ============================================================================
+// ShopEasy · Estilos globales
+// Todo el color sale de los tokens de theme/variables.scss.
+// ============================================================================
+
+// ---------- Base ----------
+ion-content {
+  --background: var(--se-fondo);
+}
+
 ion-button {
   text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+  --border-radius: var(--se-radio);
+  --box-shadow: none;
 }
 
-// safe padding for ios
+// Padding seguro en iOS
 .safe-p-bottom {
-  padding-bottom: constant(safe-area-inset-bottom); // for ios 13+
-  padding-bottom: env(safe-area-inset-bottom); // for previous ios versions
-}
-
-.submit {
-  margin-top: 40px;
-}
-
-.empty {
-  text-align: center;
-  padding: 60px;
-  opacity: 30%;
-
-  ion-icon {
-    font-size: 100px;
-  }
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .d-flex-center {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 100%;
+}
+
+// ---------- Cabecera ----------
+.se-toolbar {
+  --background: var(--ion-toolbar-background);
+  --color: var(--ion-toolbar-color);
+  --border-width: 0;
+  --min-height: 56px;
+
+  ion-title {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+
+  ion-back-button,
+  ion-button {
+    --color: var(--ion-toolbar-color);
+  }
+}
+
+// En claro la cabecera es verde y necesita separarse del fondo;
+// en oscuro es una superficie y basta un borde sutil.
+@media (prefers-color-scheme: dark) {
+  .se-toolbar {
+    --border-width: 0 0 1px 0;
+    --border-color: var(--se-borde);
+    --border-style: solid;
+  }
+}
+
+// ---------- Títulos de sección ----------
+.se-seccion {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 4px 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--se-texto);
+  }
+
+  .se-contador {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--se-texto-suave);
+  }
+}
+
+// ---------- Formularios ----------
+.auth-form {
+  width: 100%;
+  padding: 24px 20px 40px;
 }
 
 .custom-input {
-  --border-color: #aeaeae;
-  --border-radius: 15px;
+  --background: var(--se-superficie);
+  --border-radius: var(--se-radio);
+  --border-color: var(--se-borde);
   --border-style: solid;
   --border-width: 1px;
-  margin: 20px 0;
+  --highlight-color-focused: var(--ion-color-primary);
+  --padding-start: 14px;
+  --inner-padding-end: 8px;
+  --min-height: 58px;
+  margin: 12px 0;
+  border-radius: var(--se-radio);
+  transition: border-color .15s ease, box-shadow .15s ease;
 
-  ion-label {
-    position: relative;
-    bottom: 2px;
+  ion-icon[slot="start"] {
+    color: var(--se-texto-suave);
+    margin-inline-end: 12px;
+    font-size: 20px;
   }
 
-  .eye-icon {
-    position: relative;
-    top: 13px;
+  // El foco lo marca el contenedor, no solo el subrayado de Ionic
+  &.item-has-focus {
+    --border-color: var(--ion-color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), .15);
   }
 }
 
 .validators {
   color: var(--ion-color-danger);
   font-size: 13px;
-  text-align: center;
+  line-height: 1.4;
+  padding: 2px 6px 0;
+  text-align: left;
 }
 
-.auth-form {
-  width: 100%;
-  text-align: center;
-  padding: 20px;
-}
-
-.product-item {
-  --padding-top: 20px;
-
-  ion-avatar {
-    width: 70px;
-    height: 80px;
-    --border-radius: 15px;
-  }
-
-  .name {
-    font-weight: 600;
-    padding-bottom: 5px;
-  }
-
-  .data {
-    font-size: 13px;
-
-    strong {
-      font-weight: 500;
-    }
-  }
-
-  .option-btn {
-    font-size: 27px;
-  }
-
-  ion-chip {
-    font-size: 14px;
-    border-radius: 10px;
-    margin-left: 0;
-  }
-}
-
-@media (min-width: 769px) {
-  .auth-form {
-    width: 500px;
-  }
-
-  .add-update-modal {
-    --height: 680px;
-  }
+.submit {
+  margin-top: 28px;
 }
 
 .forgot-password {
   cursor: pointer;
-  transition: color 0.01s ease, text-decoration 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--se-texto-suave);
+  margin: 10px 4px 0;
+  transition: color .15s ease;
+
+  &:hover {
+    color: var(--ion-color-primary);
+    text-decoration: underline;
+  }
 }
 
-.forgot-password:hover {
-  color: var(--ion-color-success-shade);
-  text-decoration: underline;
+// ---------- Estado vacío ----------
+.empty {
+  text-align: center;
+  padding: 48px 32px;
+  color: var(--se-texto-suave);
+
+  .empty-icono {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 18px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--se-superficie-alt);
+    color: var(--se-texto-suave);
+
+    ion-icon {
+      font-size: 36px;
+    }
+  }
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--se-texto);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
 }
 
-.custom-load {
-  --spinner-color: rgb(26, 225, 70);
+// ---------- Barra de progreso ----------
+.se-progreso {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--se-superficie-alt);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--se-green-500);
+    transition: width .35s ease;
+  }
+
+  &.completo span {
+    background: var(--ion-color-success);
+  }
 }
 
+// ---------- Etiquetas de estado ----------
+.se-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &.activo {
+    color: var(--ion-color-warning);
+    background: rgba(var(--ion-color-warning-rgb), .12);
+  }
+
+  &.completo {
+    color: var(--ion-color-success);
+    background: rgba(var(--ion-color-success-rgb), .12);
+  }
+}
+
+// ---------- Diálogos ----------
 .custom-alert {
-  --backdrop-opacity: 0.7;
+  --backdrop-opacity: .5;
 
   .alert-wrapper {
-    border-radius: 8px;
+    border-radius: var(--se-radio-lg);
+    background: var(--se-superficie);
   }
 
   .alert-title {
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--se-texto);
   }
 
   .alert-message {
-    color: #4c4c4c;
-    font-size: 15px;
-    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--se-texto-suave);
+  }
+
+  .alert-button-group {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .cancel-button,
+  .logout-button {
+    border-radius: var(--se-radio-sm);
+    font-weight: 600;
+    flex: 1;
+    justify-content: center;
   }
 
   .cancel-button {
-    color: rgb(223, 27, 27);
-    background: #cecece;
-    font-weight: bolder;
+    color: var(--se-texto-suave);
+    background: var(--se-superficie-alt);
   }
 
   .logout-button {
-    color: rgb(21, 171, 53);
-    background: #cecece;
-    font-weight: bolder;
+    color: var(--ion-color-primary-contrast);
+    background: var(--ion-color-primary);
+  }
+
+  // Confirmaciones destructivas: el botón de confirmar va en rojo
+  &.peligro .logout-button {
+    color: var(--ion-color-danger-contrast);
+    background: var(--ion-color-danger);
+  }
+
+  .alert-input-wrapper .alert-input {
+    border-radius: var(--se-radio-sm);
+    border: 1px solid var(--se-borde);
+    background: var(--se-superficie-alt);
+    padding: 10px 12px;
   }
 }
 
+.custom-load {
+  --spinner-color: var(--ion-color-primary);
+}
+
+// ---------- Toasts ----------
+ion-toast {
+  --border-radius: var(--se-radio);
+  font-weight: 500;
+}
+
+// ---------- Modal ----------
 .add-update-modal {
-  --height: 95%;
-  --border-radius: 10px;
+  --height: 92%;
+  --border-radius: var(--se-radio-lg) var(--se-radio-lg) 0 0;
+  --box-shadow: var(--se-sombra-alta);
+  align-items: flex-end;
 }
 
 @media screen and (max-width: 768px) {
   .add-update-modal {
     --height: 100%;
     --border-radius: 0;
+  }
+}
+
+@media (min-width: 769px) {
+  .auth-form {
+    width: 440px;
+    padding-inline: 0;
+  }
+
+  .add-update-modal {
+    --height: 700px;
+    --width: 560px;
+    --border-radius: var(--se-radio-lg);
+    align-items: center;
+  }
+}
+
+// ---------- Pestañas ----------
+ion-tab-bar {
+  --background: var(--se-superficie);
+  --border: 1px solid var(--se-borde);
+  height: 60px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-tab-button {
+  --color: var(--se-texto-suave);
+  --color-selected: var(--ion-color-primary);
+  font-weight: 600;
+
+  ion-icon {
+    font-size: 23px;
+  }
+
+  ion-label {
+    font-size: 11.5px;
+    margin-top: 3px;
   }
 }

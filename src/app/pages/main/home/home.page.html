@@ -5,71 +5,67 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!--Lista de compras-->
-  <div class="body-div" *ngIf="!loading">
-    <h2>Listas de Compras</h2>
-    <ion-grid>
-      <ion-row>
-        <ion-col *ngFor="let list of lists" size="12">
-          <ion-card mode="ios" class="card-container">
-            <div class="content">
-              <div class="content-card" (click)="addOrUpdateList(list)">
-                <div class="title">{{list.title}}</div>
-                <div class="ion-margin-top noLoading">
-                  <p *ngIf="list?.dateHour">{{formatDate(list.dateHour)}}</p>
-                  <p [ngClass]="{'activo': list.status === 'Activo', 'completo': list.status === 'Completo'}">
-                    {{ list.status }}
-                  </p>
-                </div>
-              </div>
-              <ion-button (click)="confirmDeleteList(list)" color="light" size="large" fill="clear" mode="ios">
-                <ion-icon color="danger" name="trash"></ion-icon>
-              </ion-button>
-            </div>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </div>
+  <div class="body-div">
 
-  <!--Lista de compras cargando-->
-  <div class="body-div" *ngIf="loading">
-    <h2>Listas de Compras</h2>
-    <ion-grid>
-      <ion-row>
-        <ion-col *ngFor="let list of [1,1,1,1,1,1,1]" size="12">
-          <ion-card mode="ios" class="card-container">
-            <div class="content">
-              <div class="content-card">
-                <div class="title">
-                  <ion-skeleton-text animated style="width: 25%; height: 100%"></ion-skeleton-text>
-                </div>
-                <div class="ion-margin-top">
-                  <p>
-                    <ion-skeleton-text animated style="width: 40%; height: 100%"></ion-skeleton-text>
-                    <ion-skeleton-text animated style="width: 15%; height: 100%"></ion-skeleton-text>
-                  </p>
-                </div>
-              </div>
-              <ion-avatar>
-                <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
-              </ion-avatar>
+    <!--Lista de compras-->
+    <ng-container *ngIf="!loading">
+      <div class="se-seccion" *ngIf="lists.length">
+        <h2>Tus listas</h2>
+        <span class="se-contador">{{lists.length}} {{lists.length === 1 ? 'lista' : 'listas'}}</span>
+      </div>
+
+      <article class="lista-card" *ngFor="let list of lists" (click)="addOrUpdateList(list)">
+        <div class="lista-card__texto">
+          <h3 class="lista-card__titulo">{{list.title}}</h3>
+
+          <div class="lista-card__meta">
+            <span class="se-chip" [class.activo]="list.status === 'Activo'"
+              [class.completo]="list.status === 'Completo'">{{list.status}}</span>
+            <span class="lista-card__fecha" *ngIf="list?.dateHour">{{formatDate(list.dateHour)}}</span>
+          </div>
+
+          <div class="lista-card__progreso">
+            <div class="se-progreso" [class.completo]="getProgreso(list) === 100">
+              <span [style.width.%]="getProgreso(list)"></span>
             </div>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+            <span class="lista-card__cuenta">{{getCompletados(list)}}/{{list.items?.length || 0}}</span>
+          </div>
+        </div>
+
+        <ion-button class="lista-card__borrar" fill="clear" shape="round" (click)="confirmDeleteList(list); $event.stopPropagation()"
+          aria-label="Eliminar lista">
+          <ion-icon slot="icon-only" color="medium" name="trash-outline"></ion-icon>
+        </ion-button>
+      </article>
+    </ng-container>
+
+    <!--Lista de compras cargando-->
+    <ng-container *ngIf="loading">
+      <div class="se-seccion">
+        <h2>Tus listas</h2>
+      </div>
+      <article class="lista-card" *ngFor="let s of [1,2,3,4]">
+        <div class="lista-card__texto">
+          <ion-skeleton-text animated style="width: 45%; height: 19px; margin: 0 0 12px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 30%; height: 13px; margin: 0 0 14px"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 100%; height: 6px; border-radius: 999px"></ion-skeleton-text>
+        </div>
+      </article>
+    </ng-container>
   </div>
 
   <!--Lista de compras vacía-->
   <div *ngIf="!loading && !lists.length" class="empty">
-    <ion-icon name="newspaper"></ion-icon>
-    <h3>No hay listas de compras disponibles</h3>
+    <div class="empty-icono">
+      <ion-icon name="cart-outline"></ion-icon>
+    </div>
+    <h3>Todavía no tienes listas</h3>
+    <p>Crea tu primera lista con el botón <strong>+</strong> y empieza a organizar tus compras.</p>
   </div>
 
   <!--Nueva lista de compras-->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addOrUpdateList()" color="dark">
+    <ion-fab-button (click)="addOrUpdateList()" color="primary" aria-label="Nueva lista">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
