@@ -29,6 +29,24 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci && npm run build
+
+      # Las reglas van ANTES que el hosting: si no compilan o el deploy
+      # falla, el job se corta y no se publica una app que espera reglas
+      # que no estan puestas.
+      # Version de firebase-tools fijada a proposito: con @latest, cualquier
+      # release nuevo entra en el deploy sin que lo hayamos revisado.
+      - name: Deploy Firestore rules
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LISTA_COMPRAS_FA747 }}
+        run: |
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          npx --yes firebase-tools@15.26.0 deploy \
+            --only firestore:rules \
+            --project lista-compras-fa747 \
+            --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
