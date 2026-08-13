@@ -1,5 +1,6 @@
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { initializeApp } from '@angular/fire/app';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from '@angular/fire/firestore';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
@@ -20,7 +21,21 @@ new ThemeService().aplicar();
 // instala DOS copias del SDK, cada una con su propio registro de apps.
 // Registrarla en la copia equivocada hacia que Auth la encontrara y Firestore
 // no. Por lo mismo, todo el codigo importa Firebase via @angular/fire.
-initializeApp(environment.firebaseConfig);
+const firebaseApp = initializeApp(environment.firebaseConfig);
+
+// Caché en disco: la app sigue funcionando sin conexión y lo que escribas se
+// sincroniza al volver la red. En un supermercado la cobertura es mala justo
+// cuando más falta hace la lista.
+//
+// Tiene que ser initializeFirestore y AQUÍ: el primer getFirestore() del código
+// crea la instancia por defecto sin caché, y ya no se puede reconfigurar.
+try {
+  initializeFirestore(firebaseApp, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+  });
+} catch {
+  // Navegador sin IndexedDB (modo privado antiguo): sigue online, sin caché
+}
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.log(err));

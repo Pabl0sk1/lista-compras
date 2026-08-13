@@ -14,7 +14,21 @@
         <p>{{resumen()}}</p>
       </header>
 
-      <article class="lista-card" [class.lista-card--vencida]="esVencida(list)" *ngFor="let list of lists"
+      <!-- Buscador y filtros: solo aparecen cuando hay listas suficientes para
+           que merezcan la pena -->
+      <div class="filtros" *ngIf="lists.length > 2">
+        <ion-searchbar class="buscador" mode="ios" placeholder="Buscar lista o item" [debounce]="200"
+          [value]="busqueda" (ionInput)="busqueda = $any($event).detail.value ?? ''"
+          (ionClear)="busqueda = ''"></ion-searchbar>
+
+        <ion-segment class="filtros__estado" mode="ios" [value]="filtro" (ionChange)="filtro = $any($event).detail.value">
+          <ion-segment-button value="todas"><ion-label>Todas</ion-label></ion-segment-button>
+          <ion-segment-button value="activas"><ion-label>Activas</ion-label></ion-segment-button>
+          <ion-segment-button value="completas"><ion-label>Completas</ion-label></ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <article class="lista-card" [class.lista-card--vencida]="esVencida(list)" *ngFor="let list of listasVisibles"
         (click)="addOrUpdateList(list)">
         <div class="lista-card__texto">
           <h3 class="lista-card__titulo">{{list.title}}</h3>
@@ -41,10 +55,21 @@
           </div>
         </div>
 
-        <ion-button class="lista-card__borrar" fill="clear" shape="round" (click)="confirmDeleteList(list); $event.stopPropagation()">
-          <ion-icon slot="icon-only" color="medium" name="trash-outline" aria-label="Eliminar lista"></ion-icon>
+        <!-- Un solo botón de opciones en vez de acumular iconos en la tarjeta -->
+        <ion-button class="lista-card__opciones" fill="clear" shape="round"
+          (click)="opcionesLista(list); $event.stopPropagation()">
+          <ion-icon slot="icon-only" color="medium" name="ellipsis-vertical" aria-label="Opciones de la lista"></ion-icon>
         </ion-button>
       </article>
+
+      <!-- Nada coincide con la búsqueda o el filtro -->
+      <div class="empty" *ngIf="lists.length && !listasVisibles.length">
+        <div class="empty-icono">
+          <ion-icon name="search-outline"></ion-icon>
+        </div>
+        <h3>Sin resultados</h3>
+        <p>Prueba con otra palabra o cambia el filtro.</p>
+      </div>
     </ng-container>
 
     <!--Lista de compras cargando-->

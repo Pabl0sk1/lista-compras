@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { List } from 'src/app/models/list.model';
+import { List, ListStatus } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -153,6 +153,122 @@ export class HomePage implements OnInit {
     return null;
   }
 
+  // ---- Búsqueda y filtro ----
+  busqueda = '';
+  filtro: 'todas' | 'activas' | 'completas' = 'todas';
+
+  /** Lo que se pinta: el listado ya ordenado, pasado por filtro y búsqueda */
+  get listasVisibles(): List[] {
+    const texto = this.busqueda.trim().toLowerCase();
+
+    return this.lists.filter(l => {
+      if (this.filtro === 'activas' && l.status !== 'Activo') return false;
+      if (this.filtro === 'completas' && l.status !== 'Completo') return false;
+      if (!texto) return true;
+
+      // Busca también dentro de los items: uno recuerda "el pan", no el título
+      return l.title?.toLowerCase().includes(texto)
+        || (l.items ?? []).some(i => i.name?.toLowerCase().includes(texto));
+    });
+  }
+
+  // ---- Opciones de una lista ----
+  async opcionesLista(list: List) {
+    await this.utilsSvc.presentActionSheet({
+      header: list.title,
+      cssClass: 'custom-sheet',
+      mode: 'ios',
+      buttons: [
+        { text: 'Repetir lista', icon: 'copy-outline', handler: () => this.duplicarLista(list) },
+        { text: 'Compartir', icon: 'share-outline', handler: () => this.compartirLista(list) },
+        { text: 'Eliminar', icon: 'trash-outline', role: 'destructive', handler: () => this.confirmDeleteList(list) },
+        { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
+      ]
+    });
+  }
+
+  /**
+   * Duplica la lista con los items sin marcar y fecha nueva. La compra de casa
+   * se repite cada semana: rehacerla a mano cada vez es el trabajo tonto que
+   * más se nota.
+   */
+  async duplicarLista(list: List) {
+    try {
+      await this.utilsSvc.presentLoading();
+
+      const manana = new Date();
+      manana.setDate(manana.getDate() + 1);
+      manana.setHours(manana.getHours() + 1, 0, 0, 0);
+
+      await this.firebaseSvc.addToSubcollection(`users/${this.firebaseSvc.getUid()}/lists`, {
+        title: this.tituloDeCopia(list.title),
+        status: ListStatus.Active,
+        dateHour: this.aTextoLocal(manana),
+        items: (list.items ?? []).map(i => ({
+          name: i.name,
+          completed: false,
+          ...(i.quantity && i.quantity > 1 ? { quantity: i.quantity } : {})
+        }))
+      });
+
+      this.getLists();
+      this.avisar('Lista repetida, lista para usar.', 'success');
+    } catch (error) {
+      this.avisar(this.firebaseSvc.translateErrorMessage(error?.code), 'danger');
+    } finally {
+      this.utilsSvc.dismissLoading();
+    }
+  }
+
+  /** "Compra" -> "Compra (2)" -> "Compra (3)": evita un montón de títulos iguales */
+  private tituloDeCopia(titulo: string): string {
+    // Se parte del título sin sufijo para que copiar una copia no encadene
+    // "Compra (2) (2)"
+    const base = (titulo ?? 'Lista').replace(/\s*\(\d+\)$/, '');
+    let n = 2;
+    while (this.lists.some(l => l.title === `${base} (${n})`)) n++;
+    return `${base} (${n})`.slice(0, 100);
+  }
+
+  /**
+   * Comparte la lista como texto. Con Web Share sale el menú del sistema
+   * (WhatsApp, notas...); si no existe, se copia al portapapeles.
+   */
+  async compartirLista(list: List) {
+    const lineas = (list.items ?? []).map(i => {
+      const cantidad = i.quantity && i.quantity > 1 ? ` x${i.quantity}` : '';
+      return `${i.completed ? '☑' : '☐'} ${i.name}${cantidad}`;
+    });
+    const texto = `🛒 ${list.title}\n\n${lineas.join('\n') || '(sin items)'}\n\n— ShopEasy`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: list.title, text: texto });
+        return;
+      }
+      await navigator.clipboard.writeText(texto);
+      this.avisar('Lista copiada al portapapeles.', 'success');
+    } catch (error: any) {
+      // Cancelar el diálogo de compartir no es un fallo que haya que anunciar
+      if (error?.name !== 'AbortError') this.avisar('No se pudo compartir la lista.', 'warning');
+    }
+  }
+
+  private aTextoLocal(d: Date): string {
+    const dos = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}T${dos(d.getHours())}:${dos(d.getMinutes())}`;
+  }
+
+  private avisar(message: string, color: string) {
+    this.utilsSvc.presentToast({
+      message,
+      color,
+      icon: color === 'success' ? 'checkmark-circle-outline' : 'alert-circle-outline',
+      duration: 2000,
+      position: 'middle'
+    });
+  }
+
   async confirmDeleteList(list: List) {
     this.utilsSvc.presentAlert({
       header: 'Eliminar Lista',
@@ -210,15 +326,20 @@ export class HomePage implements OnInit {
 
     this.firebaseSvc.deleteSubCollection(path).then(() => {
       this.lists = this.lists.filter(li => li.id !== list.id);
+      this.utilsSvc.dismissLoading();
 
+      // Borrar era irreversible: una confirmación mal tocada se llevaba la
+      // lista para siempre. Se ofrece deshacer durante unos segundos.
       this.utilsSvc.presentToast({
-        message: 'Lista eliminada éxitosamente.',
-        color: 'success',
-        icon: 'checkmark-circle-outline',
-        duration: 1500,
-        position: 'middle'
-      })
-      this.utilsSvc.dismissLoading()
+        message: `"${list.title}" eliminada.`,
+        color: 'medium',
+        duration: 6000,
+        position: 'bottom',
+        buttons: [{
+          text: 'Deshacer',
+          handler: () => { this.restaurarLista(list); }
+        }]
+      });
 
     }, error => {
 
@@ -231,5 +352,17 @@ export class HomePage implements OnInit {
         position: 'middle'
       })
     });
+  }
+
+  /** Vuelve a crear la lista borrada. El id será otro, el contenido el mismo. */
+  private async restaurarLista(list: List) {
+    try {
+      const { id, ...datos } = list;
+      await this.firebaseSvc.addToSubcollection(`users/${this.firebaseSvc.getUid()}/lists`, datos);
+      this.getLists();
+      this.avisar('Lista restaurada.', 'success');
+    } catch (error) {
+      this.avisar('No se pudo restaurar la lista.', 'danger');
+    }
   }
 }

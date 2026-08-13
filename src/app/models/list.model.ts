@@ -1,6 +1,8 @@
 export interface Item {
     name: string,
-    completed: boolean
+    completed: boolean,
+    /** Cuántas unidades. Opcional: los items antiguos no la tienen y 1 se omite. */
+    quantity?: number
 }
 
 export enum ListStatus {

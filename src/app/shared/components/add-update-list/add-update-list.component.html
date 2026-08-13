@@ -18,6 +18,10 @@
         <span class="items-cabecera__cuenta" *ngIf="tempItems.length">
           {{getCompletados()}} de {{tempItems.length}}
         </span>
+        <ion-button fill="clear" shape="round" *ngIf="tempItems.length" (click)="alternarTodos()">
+          <ion-icon slot="icon-only" [name]="todosMarcados ? 'ellipse-outline' : 'checkmark-done-outline'"
+            [attr.aria-label]="todosMarcados ? 'Desmarcar todos' : 'Marcar todos'"></ion-icon>
+        </ion-button>
         <ion-button fill="clear" shape="round" (click)="createItem()">
           <ion-icon slot="icon-only" name="add-circle" aria-label="Añadir item"></ion-icon>
         </ion-button>
@@ -33,10 +37,14 @@
     <!-- Items -->
     <ion-reorder-group class="items-lista" [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
       <ion-item class="item-fila" lines="none" *ngFor="let item of tempItems; index as i">
-        <ion-checkbox class="custom-checkbox" mode="ios" slot="start" labelPlacement="end" justify="start"
-          [checked]="item.completed" (ionChange)="toggleItemCompleted(i, $event)">
-          <span class="item-nombre" [class.hecho]="item.completed">{{item.name}}</span>
-        </ion-checkbox>
+        <ion-checkbox class="custom-checkbox" mode="ios" slot="start" [checked]="item.completed"
+          (ionChange)="toggleItemCompleted(i, $event)" [attr.aria-label]="item.name"></ion-checkbox>
+
+        <!-- El nombre es un botón: tocarlo abre la edición -->
+        <button class="item-nombre" type="button" [class.hecho]="item.completed" (click)="editItem(i, $event)">
+          {{item.name}}
+          <span class="item-cantidad" *ngIf="item.quantity && item.quantity > 1">×{{item.quantity}}</span>
+        </button>
 
         <ion-buttons slot="end">
           <ion-button (click)="removeItem(i)" shape="round">

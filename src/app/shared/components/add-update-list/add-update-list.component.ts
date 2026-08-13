@@ -65,7 +65,12 @@ export class AddUpdateListComponent implements OnInit {
       title: this.form.controls.title.value,
       status: this.form.controls.status.value,
       dateHour: this.form.controls.dateHour.value,
-      items: this.tempItems.map(item => ({ name: item.name, completed: item.completed }))
+      items: this.tempItems.map(item => ({
+        name: item.name,
+        completed: item.completed,
+        // Solo se guarda si aporta algo: 1 es lo normal y ensuciaría el documento
+        ...(item.quantity && item.quantity > 1 ? { quantity: item.quantity } : {})
+      }))
     };
   }
 
@@ -184,46 +189,67 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   createItem() {
+    this.editorDeItem('Nuevo item', { name: '', completed: false }, (item) => {
+      this.tempItems.unshift(item);
+    });
+  }
+
+  /** Tocar el nombre de un item permite corregirlo: antes había que borrarlo y volver a escribirlo */
+  editItem(index: number, event: Event) {
+    event.stopPropagation();
+    this.editorDeItem('Editar item', this.tempItems[index], (item) => {
+      this.tempItems[index] = { ...this.tempItems[index], ...item };
+    });
+  }
+
+  /** Diálogo compartido por crear y editar */
+  private editorDeItem(header: string, base: Item, alGuardar: (item: Item) => void) {
     this.utilsSvc.presentAlert({
-      header: 'Nuevo Item',
+      header,
       cssClass: 'custom-alert',
       mode: 'ios',
       inputs: [
-        {
-          name: 'name',
-          type: 'textarea',
-          placeholder: 'Escribe...',
-        }
+        { name: 'name', type: 'textarea', placeholder: '¿Qué necesitas?', value: base.name },
+        { name: 'quantity', type: 'number', placeholder: 'Cantidad', min: 1, value: base.quantity ?? 1 }
       ],
       buttons: [
+        { text: 'Cancelar', role: 'cancel', cssClass: 'cancel-button' },
         {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'cancel-button'
-        }, {
-          text: 'Agregar',
+          text: 'Guardar',
           cssClass: 'logout-button',
           handler: (res) => {
-            if (!res.name || !res.name.trim().length) {
+            const nombre = (res.name ?? '').trim();
+            if (!nombre) {
               this.utilsSvc.presentToast({
-                message: 'La descripción no puede estar vacía.',
+                message: 'Escribe qué necesitas comprar.',
                 color: 'danger',
                 icon: 'warning-outline',
                 duration: 2000,
                 position: 'middle'
-              })
-              this.createItem();
-            } else {
-              let item: Item = { name: res.name, completed: false };
-              this.tempItems.unshift(item);
+              });
+              return false; // deja el diálogo abierto para corregir
             }
+
+            const cantidad = Math.max(1, Math.min(999, parseInt(res.quantity, 10) || 1));
+            alGuardar({ name: nombre, completed: base.completed, quantity: cantidad });
+            return true;
           }
         }
       ]
-    })
+    });
   }
 
   removeItem(index: number) {
     this.tempItems.splice(index, 1);
+  }
+
+  /** Marca o desmarca todo de una vez: útil al reutilizar una lista */
+  alternarTodos() {
+    const faltan = this.tempItems.some(i => !i.completed);
+    this.tempItems = this.tempItems.map(i => ({ ...i, completed: faltan }));
+  }
+
+  get todosMarcados(): boolean {
+    return this.tempItems.length > 0 && this.tempItems.every(i => i.completed);
   }
 }

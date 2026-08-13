@@ -1,0 +1,22 @@
+.sin-conexion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: calc(6px + env(safe-area-inset-top)) 12px 6px;
+  background: var(--ion-color-warning);
+  color: var(--ion-color-warning-contrast);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+
+  ion-icon {
+    font-size: 15px;
+    flex: none;
+  }
+}

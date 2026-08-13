@@ -1,3 +1,11 @@
 <ion-app>
+  <!-- Aviso de que se está trabajando sin red. Los cambios no se pierden
+       (Firestore los guarda en disco y los sincroniza al volver), pero el
+       usuario necesita saberlo. -->
+  <div class="sin-conexion" *ngIf="!networkSvc.enLinea()">
+    <ion-icon name="cloud-offline-outline" aria-hidden="true"></ion-icon>
+    Sin conexión · tus cambios se guardarán al volver
+  </div>
+
   <ion-router-outlet></ion-router-outlet>
 </ion-app>

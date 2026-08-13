@@ -71,10 +71,17 @@
 }
 
 .item-nombre {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 4px;
+  background: none;
+  border: 0;
+  text-align: left;
   font-size: 15px;
   line-height: 1.4;
   white-space: normal;
   color: var(--se-texto);
+  cursor: pointer;
   transition: color .15s ease;
 
   // Lo ya comprado se atenúa y se tacha
@@ -82,6 +89,25 @@
     color: var(--se-texto-suave);
     text-decoration: line-through;
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: -2px;
+    border-radius: 6px;
+  }
+}
+
+.item-cantidad {
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--se-superficie-alt);
+  color: var(--se-texto-suave);
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+  text-decoration: none;
 }
 
 .custom-checkbox {
