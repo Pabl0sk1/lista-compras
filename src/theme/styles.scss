@@ -48,14 +48,23 @@ ion-button {
   }
 }
 
-// En claro la cabecera es verde y necesita separarse del fondo;
-// en oscuro es una superficie y basta un borde sutil.
+// En claro la cabecera es verde y se separa sola del fondo; en oscuro es una
+// superficie más y necesita un borde sutil. Mismo criterio que los tokens:
+// vale la preferencia del sistema salvo que el usuario haya elegido tema.
+@mixin toolbar-oscura {
+  --border-width: 0 0 1px 0;
+  --border-color: var(--se-borde);
+  --border-style: solid;
+}
+
 @media (prefers-color-scheme: dark) {
-  .se-toolbar {
-    --border-width: 0 0 1px 0;
-    --border-color: var(--se-borde);
-    --border-style: solid;
+  :root:not([data-tema="light"]) .se-toolbar {
+    @include toolbar-oscura;
   }
+}
+
+:root[data-tema="dark"] .se-toolbar {
+  @include toolbar-oscura;
 }
 
 // ---------- Títulos de sección ----------

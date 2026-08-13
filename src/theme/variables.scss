@@ -125,10 +125,14 @@
 }
 
 // ============================================================================
-// Modo oscuro — sigue la preferencia del sistema
+// Modo oscuro
+// ----------------------------------------------------------------------------
+// Los tokens viven en un mixin porque se aplican en dos situaciones:
+//   1. El sistema pide oscuro y el usuario no ha forzado claro.
+//   2. El usuario ha elegido oscuro explícitamente (data-tema="dark").
+// El atributo lo pone ThemeService sobre <html>.
 // ============================================================================
-@media (prefers-color-scheme: dark) {
-  :root {
+@mixin tokens-oscuro {
     --se-fondo: #0B1120;
     --se-superficie: #131C2E;
     --se-superficie-alt: #1B2739;
@@ -196,5 +200,16 @@
 
     --ion-item-background: var(--se-superficie);
     --ion-card-background: var(--se-superficie);
+}
+
+// 1. Preferencia del sistema, salvo que el usuario haya forzado claro
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="light"]) {
+    @include tokens-oscuro;
   }
+}
+
+// 2. Elección explícita del usuario (gana sobre la del sistema)
+:root[data-tema="dark"] {
+  @include tokens-oscuro;
 }

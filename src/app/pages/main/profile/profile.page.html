@@ -8,10 +8,36 @@
       <p class="perfil__email">{{user.email}}</p>
     </section>
 
+    <p class="perfil__etiqueta">Apariencia</p>
+    <section class="perfil__grupo perfil__tema">
+      <ion-segment [value]="tema" (ionChange)="cambiarTema($any($event))" mode="ios">
+        <ion-segment-button value="light">
+          <ion-icon name="sunny-outline"></ion-icon>
+          <ion-label>Claro</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="dark">
+          <ion-icon name="moon-outline"></ion-icon>
+          <ion-label>Oscuro</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="system">
+          <ion-icon name="phone-portrait-outline"></ion-icon>
+          <ion-label>Sistema</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+      <p class="perfil__ayuda" *ngIf="tema === 'system'">Sigue la configuración de tu dispositivo.</p>
+    </section>
+
+    <p class="perfil__etiqueta">Cuenta</p>
     <section class="perfil__grupo">
       <button class="perfil__accion" (click)="editProfile()">
         <ion-icon name="person-outline"></ion-icon>
         <span>Editar perfil</span>
+        <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
+      </button>
+
+      <button class="perfil__accion" (click)="changePassword()">
+        <ion-icon name="key-outline"></ion-icon>
+        <span>Cambiar contraseña</span>
         <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
       </button>
 

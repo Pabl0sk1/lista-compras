@@ -1,5 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from '@angular/fire/auth';
+import {
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile,
+  sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider
+} from '@angular/fire/auth';
 import { User } from '../models/user.model';
 import { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, getFirestore, collection, collectionData, query } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
@@ -58,6 +61,23 @@ export class FirebaseService {
     return sendPasswordResetEmail(getAuth(), email);
   }
 
+  /**
+   * Cambia la contraseña de la cuenta.
+   *
+   * Firebase exige una sesión reciente para esto, y una sesión vieja fallaría
+   * con auth/requires-recent-login. Se reautentica primero con la contraseña
+   * actual, lo que ademas verifica que quien pide el cambio la conoce: sin eso,
+   * cualquiera con el dispositivo desbloqueado podria cambiarla.
+   */
+  async changePassword(actual: string, nueva: string) {
+    const user = getAuth().currentUser;
+    if (!user?.email) throw { code: 'auth/no-current-user' };
+
+    const credencial = EmailAuthProvider.credential(user.email, actual);
+    await reauthenticateWithCredential(user, credencial);
+    await updatePassword(user, nueva);
+  }
+
   //Obtener documento
   async getDocument(path: string) {
     return (await getDoc(doc(getFirestore(), path))).data();
@@ -111,6 +131,9 @@ export class FirebaseService {
       'auth/weak-password': 'La contraseña es demasiado débil.',
       'auth/network-request-failed': 'Error de red. Verifica tu conexión.',
       'auth/too-many-requests': 'Demasiados intentos. Intenta de nuevo más tarde.',
+      'auth/missing-password': 'Debes escribir tu contraseña.',
+      'auth/requires-recent-login': 'Por seguridad, vuelve a iniciar sesión e inténtalo de nuevo.',
+      'auth/no-current-user': 'No hay una sesión activa.',
       'permission-denied': 'Acceso denegado.'
     };
 

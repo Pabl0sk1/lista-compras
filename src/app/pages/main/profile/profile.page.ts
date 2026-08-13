@@ -4,6 +4,8 @@ import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { EditProfileComponent } from 'src/app/shared/components/edit-profile/edit-profile.component';
+import { ChangePasswordComponent } from 'src/app/shared/components/change-password/change-password.component';
+import { Tema, ThemeService } from 'src/app/services/theme.service';
 import { orderBy } from '@angular/fire/firestore';
 import { deleteUser } from '@angular/fire/auth';
 
@@ -20,6 +22,7 @@ export class ProfilePage implements OnInit {
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
+  themeSvc = inject(ThemeService);
 
   ngOnInit() {
   }
@@ -38,6 +41,15 @@ export class ProfilePage implements OnInit {
     return (this.user?.name || this.user?.email || '?').trim().charAt(0).toUpperCase();
   }
 
+  // ---- Tema ----
+  get tema(): Tema {
+    return this.themeSvc.tema;
+  }
+
+  cambiarTema(event: CustomEvent) {
+    this.themeSvc.setTema(event.detail.value as Tema);
+  }
+
   //Editar Perfil
   async editProfile() {
     let res = await this.utilsSvc.presentModal({
@@ -45,6 +57,14 @@ export class ProfilePage implements OnInit {
       cssClass: 'add-update-modal'
     })
     if (res) this.getUser();
+  }
+
+  //Cambiar contraseña
+  changePassword() {
+    return this.utilsSvc.presentModal({
+      component: ChangePasswordComponent,
+      cssClass: 'add-update-modal'
+    });
   }
 
   async confirmDeleteLists() {

@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddUpdateListComponent } from './components/add-update-list/add-update-list.component';
 import { CustomInputListComponent } from './components/custom-input-list/custom-input-list.component';
 import { EditProfileComponent } from './components/edit-profile/edit-profile.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { EditProfileComponent } from './components/edit-profile/edit-profile.com
     LogoComponent,
     AddUpdateListComponent,
     EditProfileComponent,
-    CustomInputListComponent
+    CustomInputListComponent,
+    ChangePasswordComponent
   ],
   exports: [
     HeaderComponent,
@@ -25,6 +27,7 @@ import { EditProfileComponent } from './components/edit-profile/edit-profile.com
     AddUpdateListComponent,
     EditProfileComponent,
     CustomInputListComponent,
+    ChangePasswordComponent,
     ReactiveFormsModule
   ],
   imports: [

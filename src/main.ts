@@ -3,6 +3,12 @@ import { initializeApp } from '@angular/fire/app';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import { ThemeService } from './app/services/theme.service';
+
+// El tema se aplica antes de arrancar Angular: si se hiciera en un componente,
+// la primera pintura saldría con el tema del sistema y se vería un parpadeo
+// al corregirlo. El servicio no tiene dependencias, se puede instanciar suelto.
+new ThemeService().aplicar();
 
 // Se inicializa ANTES del bootstrap: los providers de @angular/fire son
 // perezosos (solo corren si alguien inyecta FirebaseApp, cosa que este codigo
