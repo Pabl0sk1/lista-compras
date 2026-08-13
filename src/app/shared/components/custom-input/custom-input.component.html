@@ -4,8 +4,8 @@
   <ion-input [type]="type" [autocomplete]="autocomplete" [label]="label" [formControl]="control"
     labelPlacement="floating"></ion-input>
 
-  <ion-button *ngIf="isPassword" (click)="showOrHidePassword()" slot="end" fill="clear" shape="round"
-    [attr.aria-label]="hide ? 'Mostrar contraseña' : 'Ocultar contraseña'">
-    <ion-icon color="medium" slot="icon-only" [name]="hide ? 'eye-outline' : 'eye-off-outline'"></ion-icon>
+  <ion-button *ngIf="isPassword" (click)="showOrHidePassword()" slot="end" fill="clear" shape="round">
+    <ion-icon color="medium" slot="icon-only" [name]="hide ? 'eye-outline' : 'eye-off-outline'"
+      [attr.aria-label]="hide ? 'Mostrar contraseña' : 'Ocultar contraseña'"></ion-icon>
   </ion-button>
 </ion-item>

@@ -32,9 +32,8 @@
           </div>
         </div>
 
-        <ion-button class="lista-card__borrar" fill="clear" shape="round" (click)="confirmDeleteList(list); $event.stopPropagation()"
-          aria-label="Eliminar lista">
-          <ion-icon slot="icon-only" color="medium" name="trash-outline"></ion-icon>
+        <ion-button class="lista-card__borrar" fill="clear" shape="round" (click)="confirmDeleteList(list); $event.stopPropagation()">
+          <ion-icon slot="icon-only" color="medium" name="trash-outline" aria-label="Eliminar lista"></ion-icon>
         </ion-button>
       </article>
     </ng-container>
@@ -65,8 +64,8 @@
 
   <!--Nueva lista de compras-->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="addOrUpdateList()" color="primary" aria-label="Nueva lista">
-      <ion-icon name="add"></ion-icon>
+    <ion-fab-button (click)="addOrUpdateList()" color="primary">
+      <ion-icon name="add" aria-label="Nueva lista"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 </ion-content>

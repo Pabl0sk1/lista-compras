@@ -18,8 +18,8 @@
         <span class="items-cabecera__cuenta" *ngIf="tempItems.length">
           {{getCompletados()}} de {{tempItems.length}}
         </span>
-        <ion-button fill="clear" shape="round" (click)="createItem()" aria-label="Añadir item">
-          <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+        <ion-button fill="clear" shape="round" (click)="createItem()">
+          <ion-icon slot="icon-only" name="add-circle" aria-label="Añadir item"></ion-icon>
         </ion-button>
       </div>
 
@@ -39,8 +39,8 @@
         </ion-checkbox>
 
         <ion-buttons slot="end">
-          <ion-button (click)="removeItem(i)" shape="round" aria-label="Quitar item">
-            <ion-icon slot="icon-only" name="close" color="medium"></ion-icon>
+          <ion-button (click)="removeItem(i)" shape="round">
+            <ion-icon slot="icon-only" name="close" color="medium" aria-label="Quitar item"></ion-icon>
           </ion-button>
           <!-- El asa va en la misma fila; antes ocupaba una fila extra por item -->
           <ion-reorder class="item-asa"></ion-reorder>

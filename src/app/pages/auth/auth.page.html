@@ -19,7 +19,12 @@
         <div *ngIf="form.controls.password.errors?.['required']">La contraseña es obligatoria.</div>
       </div>
 
-      <p routerLink="forgot-password" class="ion-text-end forgot-password">¿Has olvidado tu contraseña?</p>
+      <!-- Botón real, no un <p> con routerLink: así es alcanzable por teclado
+           y anunciable por lectores de pantalla. -->
+      <div class="ion-text-end">
+        <button type="button" routerLink="forgot-password" class="forgot-password">¿Has olvidado tu
+          contraseña?</button>
+      </div>
 
       <ion-button color="primary" expand="block" mode="ios" class="submit" type="submit" [disabled]="form.invalid">
         Iniciar Sesión

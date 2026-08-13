@@ -2,8 +2,8 @@
   <ion-toolbar class="se-toolbar">
 
     <ion-buttons slot="start">
-      <ion-button shape="round" (click)="dismissModal()" *ngIf="isModal" aria-label="Cerrar">
-        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      <ion-button shape="round" (click)="dismissModal()" *ngIf="isModal">
+        <ion-icon slot="icon-only" name="close-outline" aria-label="Cerrar"></ion-icon>
       </ion-button>
 
       <ion-back-button *ngIf="backButton" [defaultHref]="backButton" text=""></ion-back-button>
