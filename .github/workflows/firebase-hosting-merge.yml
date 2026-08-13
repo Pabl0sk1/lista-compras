@@ -1,0 +1,37 @@
+# Generado por la CLI de Firebase y ajustado a mano:
+# https://github.com/firebase/firebase-tools
+
+name: Deploy to Firebase Hosting on merge
+on:
+  push:
+    branches:
+      - master
+
+# Solo lectura del repo: el deploy usa la cuenta de servicio, no este token
+permissions:
+  contents: read
+
+# Evita que dos pushes seguidos publiquen en orden invertido.
+# cancel-in-progress: false para no cortar un deploy a medias.
+concurrency:
+  group: hosting-live
+  cancel-in-progress: false
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Angular 20 exige node ^20.19 || ^22.12 || >=24. Sin esto se usa la
+      # version que traiga la imagen del runner, que cambia sin avisar.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci && npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LISTA_COMPRAS_FA747 }}
+          channelId: live
+          projectId: lista-compras-fa747
