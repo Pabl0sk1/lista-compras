@@ -22,22 +22,28 @@
     </div>
     <span class="compra-progreso__texto">
       {{pendientes ? (pendientes === 1 ? 'Queda 1 item' : 'Quedan ' + pendientes + ' items') : '¡Todo listo!'}}
+      <em *ngIf="hayPrecios"> · {{totalPendiente}}</em>
     </span>
   </div>
 </ion-header>
 
 <ion-content class="compra">
-  <!-- Un toque en toda la fila: se compra con una mano y sin apuntar fino -->
-  <button class="compra-item" type="button" *ngFor="let item of visibles" [class.hecho]="item.completed"
-    (click)="alternar(item)">
-    <span class="compra-item__marca">
-      <ion-icon [name]="item.completed ? 'checkmark-circle' : 'ellipse-outline'" aria-hidden="true"></ion-icon>
-    </span>
-    <span class="compra-item__nombre">
-      {{item.name}}
-      <span class="compra-item__cantidad" *ngIf="item.quantity && item.quantity > 1">×{{item.quantity}}</span>
-    </span>
-  </button>
+  <!-- Agrupado por sección del súper cuando hay más de una -->
+  <ng-container *ngFor="let grupo of grupos">
+    <h3 class="compra-seccion" *ngIf="grupo.seccion">{{grupo.seccion}}</h3>
+
+    <!-- Un toque en toda la fila: se compra con una mano y sin apuntar fino -->
+    <button class="compra-item" type="button" *ngFor="let item of grupo.items" [class.hecho]="item.completed"
+      (click)="alternar(item)">
+      <span class="compra-item__marca">
+        <ion-icon [name]="item.completed ? 'checkmark-circle' : 'ellipse-outline'" aria-hidden="true"></ion-icon>
+      </span>
+      <span class="compra-item__nombre">
+        {{item.name}}
+        <span class="compra-item__cantidad" *ngIf="item.quantity && item.quantity > 1">×{{item.quantity}}</span>
+      </span>
+    </button>
+  </ng-container>
 
   <div class="compra-vacio" *ngIf="!visibles.length">
     <ion-icon [name]="items.length ? 'checkmark-done-circle-outline' : 'basket-outline'"></ion-icon>

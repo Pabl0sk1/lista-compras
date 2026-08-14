@@ -170,3 +170,17 @@
   0%, 100% { opacity: 1; }
   50% { opacity: .4; }
 }
+
+.compra-seccion {
+  margin: 18px 16px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--se-texto-suave);
+}
+
+.compra-progreso__texto em {
+  font-style: normal;
+  opacity: .85;
+}

@@ -39,6 +39,37 @@
       <p class="perfil__ayuda" *ngIf="tema === 'system'">Sigue la configuración de tu dispositivo.</p>
     </section>
 
+    <p class="perfil__etiqueta">Moneda</p>
+    <section class="perfil__grupo perfil__tema">
+      <ion-segment [value]="monedaSvc.simbolo" (ionChange)="cambiarMoneda($any($event))" mode="ios">
+        <ion-segment-button *ngFor="let m of MONEDAS" [value]="m.simbolo">
+          <ion-label>{{m.simbolo || 'Ninguno'}}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </section>
+
+    <p class="perfil__etiqueta">Tus datos</p>
+    <section class="perfil__grupo">
+      <button class="perfil__accion" (click)="exportar()">
+        <ion-icon name="download-outline"></ion-icon>
+        <span>
+          Exportar mis listas
+          <small class="perfil__estado">Copia de seguridad en un archivo</small>
+        </span>
+        <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
+      </button>
+
+      <button class="perfil__accion" (click)="selectorRespaldo.click()">
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+        <span>
+          Importar desde un archivo
+          <small class="perfil__estado">Se suman a las que ya tienes</small>
+        </span>
+        <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
+      </button>
+      <input #selectorRespaldo type="file" accept="application/json,.json" hidden (change)="importar($event)" />
+    </section>
+
     <p class="perfil__etiqueta">Aplicación</p>
     <section class="perfil__grupo">
       <button class="perfil__accion" (click)="instalarApp()" [disabled]="pwaSvc.instalada">

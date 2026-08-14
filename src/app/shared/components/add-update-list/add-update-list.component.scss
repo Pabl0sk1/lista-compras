@@ -210,3 +210,62 @@
     border-color: var(--ion-color-primary);
   }
 }
+
+.item-precio,
+.item-seccion {
+  display: inline-block;
+  margin-inline-start: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.item-precio {
+  color: var(--ion-color-primary);
+}
+
+.item-seccion {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--se-superficie-alt);
+  color: var(--se-texto-suave);
+  font-weight: 500;
+}
+
+.total-estimado {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--se-radio);
+  background: var(--se-superficie-alt);
+
+  span {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--se-texto-suave);
+  }
+
+  strong {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--se-texto);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.nota-lista {
+  margin-top: 16px;
+  padding: 4px 14px;
+  background: var(--se-superficie);
+  border: 1px solid var(--se-borde);
+  border-radius: var(--se-radio);
+
+  ion-textarea {
+    --color: var(--se-texto);
+    --placeholder-color: var(--se-texto-suave);
+    font-size: 15px;
+  }
+}

@@ -3,6 +3,7 @@ import { Item, List, ListStatus } from 'src/app/models/list.model';
 import { DictadoService } from 'src/app/services/dictado.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { MonedaService } from 'src/app/services/moneda.service';
 
 @Component({
   selector: 'app-shopping-mode',
@@ -15,6 +16,7 @@ export class ShoppingModeComponent implements OnInit, OnDestroy {
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
   dictadoSvc = inject(DictadoService);
+  monedaSvc = inject(MonedaService);
 
   @Input() list!: List;
 
@@ -45,6 +47,29 @@ export class ShoppingModeComponent implements OnInit, OnDestroy {
     // Lo pendiente primero: es lo que queda por hacer
     const orden = [...this.items].sort((a, b) => Number(a.completed) - Number(b.completed));
     return this.soloPendientes ? orden.filter(i => !i.completed) : orden;
+  }
+
+/**
+   * Agrupa por sección del súper: recorrer el pasillo de lácteos entero antes
+   * de cruzar la tienda otra vez ahorra vueltas de verdad.
+   */
+  get grupos(): { seccion: string, items: Item[] }[] {
+    const mapa = new Map<string, Item[]>();
+    for (const item of this.visibles) {
+      const seccion = item.category || 'Sin sección';
+      mapa.set(seccion, [...(mapa.get(seccion) ?? []), item]);
+    }
+    // Con una sola sección no merece la pena enseñar cabeceras
+    if (mapa.size <= 1) return [{ seccion: '', items: this.visibles }];
+    return [...mapa.entries()].map(([seccion, items]) => ({ seccion, items }));
+  }
+
+  get totalPendiente(): string {
+    return this.monedaSvc.formatear(this.monedaSvc.totalPendiente(this.items));
+  }
+
+  get hayPrecios(): boolean {
+    return this.monedaSvc.hayPrecios(this.items);
   }
 
   get pendientes(): number {
@@ -110,6 +135,9 @@ export class ShoppingModeComponent implements OnInit, OnDestroy {
     const completos = this.items.length > 0 && this.items.every(i => i.completed);
 
     try {
+      // Se escribe el documento entero, así que hay que arrastrar todo lo que
+      // esta pantalla no toca (precio, sección, nota). Omitirlo lo borraría en
+      // silencio con solo abrir el modo compra y cerrarlo.
       await this.firebaseSvc.updateSubCollection(`users/${uid}/lists/${this.list.id}`, {
         title: this.list.title,
         status: completos ? ListStatus.Completed : ListStatus.Active,
@@ -117,8 +145,11 @@ export class ShoppingModeComponent implements OnInit, OnDestroy {
         items: this.items.map(i => ({
           name: i.name,
           completed: i.completed,
-          ...(i.quantity && i.quantity > 1 ? { quantity: i.quantity } : {})
-        }))
+          ...(i.quantity && i.quantity > 1 ? { quantity: i.quantity } : {}),
+          ...(i.price ? { price: i.price } : {}),
+          ...(i.category ? { category: i.category } : {})
+        })),
+        ...(this.list.note ? { note: this.list.note } : {})
       });
     } catch (error) {
       this.avisar('No se pudo guardar. Se reintentará al volver la conexión.', 'warning');

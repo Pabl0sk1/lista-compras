@@ -63,7 +63,7 @@ service cloud.firestore {
     }
 
     function validList() {
-      return incoming().keys().hasOnly(['id', 'title', 'status', 'dateHour', 'items'])
+      return incoming().keys().hasOnly(['id', 'title', 'status', 'dateHour', 'items', 'note'])
         && incoming().title is string
         && incoming().title.size() > 0
         && incoming().title.size() <= 100
@@ -71,7 +71,10 @@ service cloud.firestore {
         && incoming().dateHour is string
         && incoming().dateHour.size() <= 40
         && incoming().items is list
-        && incoming().items.size() <= 200;
+        && incoming().items.size() <= 200
+        // La nota es texto libre: hay que ponerle tope como a todo lo demás
+        && (!('note' in incoming())
+            || (incoming().note is string && incoming().note.size() <= 500));
     }
 
     match /users/{uid} {

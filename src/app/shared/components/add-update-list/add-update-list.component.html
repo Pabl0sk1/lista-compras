@@ -64,9 +64,14 @@
         <button class="item-nombre" type="button" [class.hecho]="item.completed" (click)="editItem(i, $event)">
           {{item.name}}
           <span class="item-cantidad" *ngIf="item.quantity && item.quantity > 1">×{{item.quantity}}</span>
+          <span class="item-precio" *ngIf="item.price">{{formatearImporte(item.price * (item.quantity || 1))}}</span>
+          <span class="item-seccion" *ngIf="item.category">{{item.category}}</span>
         </button>
 
         <ion-buttons slot="end">
+          <ion-button (click)="elegirCategoria(i, $event)" shape="round">
+            <ion-icon slot="icon-only" name="pricetag-outline" color="medium" aria-label="Sección"></ion-icon>
+          </ion-button>
           <ion-button (click)="removeItem(i)" shape="round">
             <ion-icon slot="icon-only" name="close" color="medium" aria-label="Quitar item"></ion-icon>
           </ion-button>
@@ -75,6 +80,18 @@
         </ion-buttons>
       </ion-item>
     </ion-reorder-group>
+
+    <!-- Total estimado: solo aparece si has puesto algún precio -->
+    <div class="total-estimado" *ngIf="hayPrecios">
+      <span>Total estimado</span>
+      <strong>{{formatearImporte(total)}}</strong>
+    </div>
+
+    <!-- Nota de la lista -->
+    <div class="nota-lista">
+      <ion-textarea label="Nota (opcional)" labelPlacement="floating" [autoGrow]="true" maxlength="500"
+        placeholder="Dónde comprar, para quién es, qué no olvidar…" [(ngModel)]="nota"></ion-textarea>
+    </div>
 
     <!-- Sin items -->
     <div class="empty" *ngIf="!tempItems.length">

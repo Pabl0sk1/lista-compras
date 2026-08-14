@@ -1,9 +1,10 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ItemReorderEventDetail } from '@ionic/angular';
-import { Item, List, ListStatus } from 'src/app/models/list.model';
+import { CATEGORIAS, Item, List, ListStatus } from 'src/app/models/list.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { MonedaService } from 'src/app/services/moneda.service';
 import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
@@ -16,6 +17,9 @@ export class AddUpdateListComponent implements OnInit {
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
+  monedaSvc = inject(MonedaService);
+
+  CATEGORIAS = CATEGORIAS;
 
   @Input() list: List;
   /** Lo que el usuario suele comprar, calculado en la pantalla de inicio */
@@ -23,6 +27,7 @@ export class AddUpdateListComponent implements OnInit {
 
   tempItems: Item[] = [];
   nuevoItem = '';
+  nota = '';
 
   /** Se ocultan las que ya están en la lista: sugerir un duplicado no aporta */
   get sugerenciasVisibles(): string[] {
@@ -58,9 +63,11 @@ export class AddUpdateListComponent implements OnInit {
 
   ngOnInit() {
     if (this.list) {
-      this.form.setValue(this.list);
+      const { note, ...campos } = this.list;
+      this.form.setValue(campos as any);
       this.form.updateValueAndValidity();
       this.tempItems = this.list.items.map(item => ({ ...item }));
+      this.nota = this.list.note ?? '';
     }
   }
 
@@ -93,9 +100,13 @@ export class AddUpdateListComponent implements OnInit {
       items: this.tempItems.map(item => ({
         name: item.name,
         completed: item.completed,
-        // Solo se guarda si aporta algo: 1 es lo normal y ensuciaría el documento
-        ...(item.quantity && item.quantity > 1 ? { quantity: item.quantity } : {})
-      }))
+        // Los opcionales solo se guardan si aportan algo: cantidad 1, precio 0
+        // o sección vacía solo ensuciarían el documento
+        ...(item.quantity && item.quantity > 1 ? { quantity: item.quantity } : {}),
+        ...(item.price ? { price: item.price } : {}),
+        ...(item.category ? { category: item.category } : {})
+      })),
+      ...(this.nota.trim() ? { note: this.nota.trim().slice(0, 500) } : {})
     };
   }
 
@@ -231,11 +242,16 @@ export class AddUpdateListComponent implements OnInit {
   private editorDeItem(header: string, base: Item, alGuardar: (item: Item) => void) {
     this.utilsSvc.presentAlert({
       header,
-      cssClass: 'custom-alert',
+      cssClass: 'custom-alert alerta-item',
       mode: 'ios',
       inputs: [
         { name: 'name', type: 'textarea', placeholder: '¿Qué necesitas?', value: base.name },
-        { name: 'quantity', type: 'number', placeholder: 'Cantidad', min: 1, value: base.quantity ?? 1 }
+        { name: 'quantity', type: 'number', placeholder: 'Cantidad', min: 1, value: base.quantity ?? 1 },
+        {
+          name: 'price', type: 'number', min: 0,
+          placeholder: `Precio por unidad (${this.monedaSvc.simbolo || 'opcional'})`,
+          value: base.price ?? null
+        }
       ],
       buttons: [
         { text: 'Cancelar', role: 'cancel', cssClass: 'cancel-button' },
@@ -256,12 +272,60 @@ export class AddUpdateListComponent implements OnInit {
             }
 
             const cantidad = Math.max(1, Math.min(999, parseInt(res.quantity, 10) || 1));
-            alGuardar({ name: nombre, completed: base.completed, quantity: cantidad });
+            const precio = Math.max(0, parseFloat(res.price) || 0);
+
+            alGuardar({
+              name: nombre,
+              completed: base.completed,
+              quantity: cantidad,
+              ...(precio > 0 ? { price: precio } : {}),
+              ...(base.category ? { category: base.category } : {})
+            });
             return true;
           }
         }
       ]
     });
+  }
+
+  /** Sección del súper, para poder agrupar por pasillo al comprar */
+  async elegirCategoria(index: number, event: Event) {
+    event.stopPropagation();
+    const item = this.tempItems[index];
+
+    await this.utilsSvc.presentActionSheet({
+      header: 'Sección',
+      cssClass: 'custom-sheet',
+      mode: 'ios',
+      buttons: [
+        ...CATEGORIAS.map(c => ({
+          text: c,
+          handler: () => { this.tempItems[index] = { ...item, category: c }; }
+        })),
+        {
+          text: 'Sin sección',
+          role: 'destructive',
+          handler: () => {
+            const { category, ...resto } = this.tempItems[index];
+            this.tempItems[index] = resto;
+          }
+        },
+        { text: 'Cancelar', role: 'cancel' }
+      ]
+    });
+  }
+
+  // ---- Totales ----
+  get total(): number {
+    return this.monedaSvc.total(this.tempItems);
+  }
+
+  get hayPrecios(): boolean {
+    return this.monedaSvc.hayPrecios(this.tempItems);
+  }
+
+  formatearImporte(importe: number): string {
+    return this.monedaSvc.formatear(importe);
   }
 
   removeItem(index: number) {

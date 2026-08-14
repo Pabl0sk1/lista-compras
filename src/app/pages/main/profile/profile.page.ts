@@ -8,6 +8,8 @@ import { EditProfileComponent } from 'src/app/shared/components/edit-profile/edi
 import { ChangePasswordComponent } from 'src/app/shared/components/change-password/change-password.component';
 import { Tema, ThemeService } from 'src/app/services/theme.service';
 import { PwaService } from 'src/app/services/pwa.service';
+import { MONEDAS, MonedaService } from 'src/app/services/moneda.service';
+import { RespaldoService } from 'src/app/services/respaldo.service';
 import { TwoFactorComponent } from 'src/app/shared/components/two-factor/two-factor.component';
 import { VerifyCodeComponent } from 'src/app/shared/components/verify-code/verify-code.component';
 import { orderBy } from '@angular/fire/firestore';
@@ -29,6 +31,8 @@ export class ProfilePage implements OnInit, OnDestroy {
   utilsSvc = inject(UtilsService);
   themeSvc = inject(ThemeService);
   pwaSvc = inject(PwaService);
+  monedaSvc = inject(MonedaService);
+  respaldoSvc = inject(RespaldoService);
 
   @ViewChild('selectorFoto') selectorFoto!: ElementRef<HTMLInputElement>;
 
@@ -64,6 +68,39 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   cambiarTema(event: CustomEvent) {
     this.themeSvc.setTema(event.detail.value as Tema);
+  }
+
+  // ---- Moneda ----
+  MONEDAS = MONEDAS;
+
+  cambiarMoneda(event: CustomEvent) {
+    this.monedaSvc.simbolo = event.detail.value;
+  }
+
+  // ---- Copia de seguridad ----
+  exportar() {
+    if (!this.lists.length) {
+      return this.avisar('No tienes listas que exportar.', 'warning');
+    }
+    const cuantas = this.respaldoSvc.exportar(this.lists);
+    this.avisar(`${cuantas} ${cuantas === 1 ? 'lista exportada' : 'listas exportadas'}.`, 'success');
+  }
+
+  async importar(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // permite volver a elegir el mismo archivo
+    if (!file) return;
+
+    try {
+      await this.utilsSvc.presentLoading();
+      const creadas = await this.respaldoSvc.importar(file);
+      this.avisar(`${creadas} ${creadas === 1 ? 'lista importada' : 'listas importadas'}.`, 'success');
+    } catch (error: any) {
+      this.avisar(error?.message ?? 'No se pudo importar el archivo.', 'danger');
+    } finally {
+      this.utilsSvc.dismissLoading();
+    }
   }
 
   // ---- Verificación en dos pasos ----
