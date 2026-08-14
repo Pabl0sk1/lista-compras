@@ -50,6 +50,21 @@
 
     <p class="perfil__etiqueta">Tus datos</p>
     <section class="perfil__grupo">
+      <button class="perfil__accion" (click)="verEstadisticas()">
+        <ion-icon name="stats-chart-outline"></ion-icon>
+        <span>Tus números</span>
+        <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
+      </button>
+
+      <button class="perfil__accion" (click)="verPapelera()">
+        <ion-icon name="trash-bin-outline"></ion-icon>
+        <span>
+          Papelera
+          <small class="perfil__estado" *ngIf="enPapelera.length">{{enPapelera.length}} en espera</small>
+        </span>
+        <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
+      </button>
+
       <button class="perfil__accion" (click)="exportar()">
         <ion-icon name="download-outline"></ion-icon>
         <span>

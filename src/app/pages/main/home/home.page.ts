@@ -167,11 +167,20 @@ export class HomePage implements OnInit, OnDestroy {
   busqueda = '';
   filtro: 'todas' | 'activas' | 'completas' = 'todas';
 
+  /** Listas vivas: ni en la papelera ni plantillas */
+  get listasActivas(): List[] {
+    return this.lists.filter(l => !l.deletedAt && !l.template);
+  }
+
+  get plantillas(): List[] {
+    return this.lists.filter(l => l.template && !l.deletedAt);
+  }
+
   /** Lo que se pinta: el listado ya ordenado, pasado por filtro y búsqueda */
   get listasVisibles(): List[] {
     const texto = this.busqueda.trim().toLowerCase();
 
-    return this.lists.filter(l => {
+    return this.listasActivas.filter(l => {
       if (this.filtro === 'activas' && l.status !== 'Activo') return false;
       if (this.filtro === 'completas' && l.status !== 'Completo') return false;
       if (!texto) return true;
@@ -191,6 +200,7 @@ export class HomePage implements OnInit, OnDestroy {
       buttons: [
         { text: 'Modo compra', icon: 'basket-outline', handler: () => this.modoCompra(list) },
         { text: 'Repetir lista', icon: 'copy-outline', handler: () => this.duplicarLista(list) },
+        { text: 'Guardar como plantilla', icon: 'bookmark-outline', handler: () => this.guardarComoPlantilla(list) },
         { text: 'Compartir', icon: 'share-outline', handler: () => this.compartirLista(list) },
         { text: 'Eliminar', icon: 'trash-outline', role: 'destructive', handler: () => this.confirmDeleteList(list) },
         { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
@@ -203,7 +213,7 @@ export class HomePage implements OnInit, OnDestroy {
    * se repite cada semana: rehacerla a mano cada vez es el trabajo tonto que
    * más se nota.
    */
-  async duplicarLista(list: List) {
+  async duplicarLista(list: List, numerar = true) {
     try {
       await this.utilsSvc.presentLoading();
 
@@ -212,14 +222,17 @@ export class HomePage implements OnInit, OnDestroy {
       manana.setHours(manana.getHours() + 1, 0, 0, 0);
 
       await this.firebaseSvc.addToSubcollection(`users/${this.firebaseSvc.getUid()}/lists`, {
-        title: this.tituloDeCopia(list.title),
+        title: numerar ? this.tituloDeCopia(list.title) : list.title,
         status: ListStatus.Active,
         dateHour: this.aTextoLocal(manana),
         items: (list.items ?? []).map(i => ({
           name: i.name,
           completed: false,
-          ...(i.quantity && i.quantity > 1 ? { quantity: i.quantity } : {})
-        }))
+          ...(i.quantity && i.quantity > 1 ? { quantity: i.quantity } : {}),
+          ...(i.price ? { price: i.price } : {}),
+          ...(i.category ? { category: i.category } : {})
+        })),
+        ...(list.note ? { note: list.note } : {})
       });
 
       this.getLists();
@@ -326,6 +339,56 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Guarda la lista como plantilla: una copia marcada que no aparece en el
+   * listado y sirve de punto de partida. Se diferencia de "repetir" en que la
+   * plantilla se queda ahí para siempre en vez de ensuciar la pantalla.
+   */
+  async guardarComoPlantilla(list: List) {
+    try {
+      await this.utilsSvc.presentLoading();
+      await this.firebaseSvc.addToSubcollection(`users/${this.firebaseSvc.getUid()}/lists`, {
+        title: list.title,
+        status: ListStatus.Active,
+        dateHour: list.dateHour,
+        template: true,
+        items: (list.items ?? []).map(i => ({
+          name: i.name,
+          completed: false,
+          ...(i.quantity && i.quantity > 1 ? { quantity: i.quantity } : {}),
+          ...(i.price ? { price: i.price } : {}),
+          ...(i.category ? { category: i.category } : {})
+        })),
+        ...(list.note ? { note: list.note } : {})
+      });
+      this.avisar('Guardada como plantilla.', 'success');
+    } catch (error) {
+      this.avisar(this.firebaseSvc.translateErrorMessage(error?.code), 'danger');
+    } finally {
+      this.utilsSvc.dismissLoading();
+    }
+  }
+
+  /** El botón + pregunta de dónde partir cuando hay plantillas guardadas */
+  async nuevaLista() {
+    if (!this.plantillas.length) return this.addOrUpdateList();
+
+    await this.utilsSvc.presentActionSheet({
+      header: 'Nueva lista',
+      cssClass: 'custom-sheet',
+      mode: 'ios',
+      buttons: [
+        { text: 'Lista en blanco', icon: 'document-outline', handler: () => this.addOrUpdateList() },
+        ...this.plantillas.map(p => ({
+          text: p.title,
+          icon: 'bookmark-outline',
+          handler: () => this.duplicarLista(p, false)
+        })),
+        { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
+      ]
+    });
+  }
+
   async addOrUpdateList(list?: List) {
     // La lista llega ya en tiempo real, así que no hace falta recargar al cerrar
     await this.utilsSvc.presentModal({
@@ -368,11 +431,16 @@ export class HomePage implements OnInit, OnDestroy {
       .map(x => x.nombre);
   }
 
+  /**
+   * Borrado suave: la lista va a la papelera. Destruirla de verdad solo pasa
+   * desde la papelera o cuando caduca, asi que un toque mal dado nunca pierde
+   * datos de forma definitiva.
+   */
   deleteList(list: List) {
     let path = `users/${this.firebaseSvc.getUid()}/lists/${list.id}`;
     this.utilsSvc.presentLoading();
 
-    this.firebaseSvc.deleteSubCollection(path).then(() => {
+    this.firebaseSvc.updateSubCollection(path, { ...this.sinId(list), deletedAt: new Date().toISOString() }).then(() => {
       this.lists = this.lists.filter(li => li.id !== list.id);
       this.utilsSvc.dismissLoading();
 
@@ -402,15 +470,22 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-  /** Vuelve a crear la lista borrada. El id será otro, el contenido el mismo. */
+  /** La lista sigue existiendo: basta con quitarle la marca de la papelera */
   private async restaurarLista(list: List) {
     try {
-      const { id, ...datos } = list;
-      await this.firebaseSvc.addToSubcollection(`users/${this.firebaseSvc.getUid()}/lists`, datos);
-      this.getLists();
+      await this.firebaseSvc.restaurarDeLaPapelera(`users/${this.firebaseSvc.getUid()}/lists/${list.id}`);
       this.avisar('Lista restaurada.', 'success');
     } catch (error) {
       this.avisar('No se pudo restaurar la lista.', 'danger');
     }
+  }
+
+  /**
+   * El documento que se escribe no puede llevar el id (las reglas solo admiten
+   * los campos del modelo) ni la marca de papelera al restaurar.
+   */
+  private sinId(list: List) {
+    const { id, deletedAt, ...datos } = list;
+    return datos;
   }
 }

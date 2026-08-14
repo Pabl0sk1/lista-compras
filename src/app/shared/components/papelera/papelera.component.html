@@ -1,0 +1,41 @@
+<app-header [isModal]="true" title="Papelera"></app-header>
+
+<ion-content>
+  <div class="papelera">
+    <p class="papelera__intro" *ngIf="listas.length">
+      Las listas borradas se guardan {{DIAS}} días por si te arrepientes.
+    </p>
+
+    <article class="papelera__item" *ngFor="let l of listas">
+      <div class="papelera__texto">
+        <h3>{{l.title}}</h3>
+        <p>{{l.items?.length || 0}} items · quedan {{diasRestantes(l)}} días</p>
+      </div>
+
+      <ion-buttons>
+        <ion-button (click)="restaurar(l)" shape="round">
+          <ion-icon slot="icon-only" name="arrow-undo-outline" color="primary"
+            aria-label="Restaurar"></ion-icon>
+        </ion-button>
+        <ion-button (click)="borrarDefinitivo(l)" shape="round">
+          <ion-icon slot="icon-only" name="trash-outline" color="danger"
+            aria-label="Borrar para siempre"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </article>
+
+    <div class="empty" *ngIf="!listas.length">
+      <div class="empty-icono">
+        <ion-icon name="trash-outline"></ion-icon>
+      </div>
+      <h3>La papelera está vacía</h3>
+      <p>Lo que borres aparecerá aquí durante {{DIAS}} días.</p>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer class="modal-pie" *ngIf="listas.length">
+  <ion-button expand="block" mode="ios" color="danger" fill="outline" (click)="vaciar()">
+    Vaciar papelera
+  </ion-button>
+</ion-footer>

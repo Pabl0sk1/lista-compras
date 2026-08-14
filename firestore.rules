@@ -63,7 +63,7 @@ service cloud.firestore {
     }
 
     function validList() {
-      return incoming().keys().hasOnly(['id', 'title', 'status', 'dateHour', 'items', 'note'])
+      return incoming().keys().hasOnly(['id', 'title', 'status', 'dateHour', 'items', 'note', 'deletedAt', 'template'])
         && incoming().title is string
         && incoming().title.size() > 0
         && incoming().title.size() <= 100
@@ -74,7 +74,11 @@ service cloud.firestore {
         && incoming().items.size() <= 200
         // La nota es texto libre: hay que ponerle tope como a todo lo demás
         && (!('note' in incoming())
-            || (incoming().note is string && incoming().note.size() <= 500));
+            || (incoming().note is string && incoming().note.size() <= 500))
+        // La papelera es un borrado suave: se marca la fecha en vez de borrar
+        && (!('deletedAt' in incoming())
+            || (incoming().deletedAt is string && incoming().deletedAt.size() <= 40))
+        && (!('template' in incoming()) || incoming().template is bool);
     }
 
     match /users/{uid} {

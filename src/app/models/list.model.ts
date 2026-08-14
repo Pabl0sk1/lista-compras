@@ -35,5 +35,9 @@ export interface List {
     dateHour: string,
     items: Item[],
     /** Nota libre: dónde comprar, para quién es, qué no olvidar */
-    note?: string
+    note?: string,
+    /** Momento en que se mandó a la papelera. Sin este campo, la lista está viva. */
+    deletedAt?: string,
+    /** Plantilla: no aparece en el listado, sirve para crear listas nuevas */
+    template?: boolean
 }

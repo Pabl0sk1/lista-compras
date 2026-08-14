@@ -4,7 +4,7 @@ import {
   sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider
 } from '@angular/fire/auth';
 import { User } from '../models/user.model';
-import { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, getFirestore, collection, collectionData, query } from '@angular/fire/firestore';
+import { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, getFirestore, collection, collectionData, query } from '@angular/fire/firestore';
 import { UtilsService } from './utils.service';
 
 @Injectable({
@@ -165,6 +165,16 @@ export class FirebaseService {
 
   updateSubCollection(path: string, data: any) {
     return updateDoc(doc(getFirestore(), path), data);
+  }
+
+  /**
+   * Saca una lista de la papelera.
+   *
+   * updateDoc fusiona: omitir `deletedAt` en el objeto NO lo borra, deja el
+   * valor anterior. Hay que pedir explícitamente que se elimine el campo.
+   */
+  restaurarDeLaPapelera(path: string) {
+    return updateDoc(doc(getFirestore(), path), { deletedAt: deleteField() });
   }
 
   deleteSubCollection(path: string) {

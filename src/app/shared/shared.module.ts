@@ -12,6 +12,8 @@ import { ChangePasswordComponent } from './components/change-password/change-pas
 import { TwoFactorComponent } from './components/two-factor/two-factor.component';
 import { VerifyCodeComponent } from './components/verify-code/verify-code.component';
 import { ShoppingModeComponent } from './components/shopping-mode/shopping-mode.component';
+import { PapeleraComponent } from './components/papelera/papelera.component';
+import { EstadisticasComponent } from './components/estadisticas/estadisticas.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,9 @@ import { ShoppingModeComponent } from './components/shopping-mode/shopping-mode.
     ChangePasswordComponent,
     TwoFactorComponent,
     VerifyCodeComponent,
-    ShoppingModeComponent
+    ShoppingModeComponent,
+    PapeleraComponent,
+    EstadisticasComponent
   ],
   exports: [
     HeaderComponent,
@@ -37,6 +41,8 @@ import { ShoppingModeComponent } from './components/shopping-mode/shopping-mode.
     TwoFactorComponent,
     VerifyCodeComponent,
     ShoppingModeComponent,
+    PapeleraComponent,
+    EstadisticasComponent,
     ReactiveFormsModule
   ],
   imports: [

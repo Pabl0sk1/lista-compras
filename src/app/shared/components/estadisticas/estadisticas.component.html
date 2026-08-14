@@ -1,0 +1,62 @@
+<app-header [isModal]="true" title="Tus números"></app-header>
+
+<ion-content>
+  <div class="stats" *ngIf="totales.listas; else sinDatos">
+
+    <div class="stats__rejilla">
+      <div class="stats__dato">
+        <strong>{{totales.listas}}</strong>
+        <span>listas</span>
+      </div>
+      <div class="stats__dato">
+        <strong>{{totales.completas}}</strong>
+        <span>completadas</span>
+      </div>
+      <div class="stats__dato">
+        <strong>{{totales.items}}</strong>
+        <span>items en total</span>
+      </div>
+      <div class="stats__dato">
+        <strong>{{porcentajeCompletado}}%</strong>
+        <span>ya comprado</span>
+      </div>
+    </div>
+
+    <section class="stats__bloque">
+      <h3>Gasto de este mes</h3>
+      <p class="stats__gasto">{{gastoMes}}</p>
+      <small>Suma de lo que ya marcaste como comprado en las listas de este mes.</small>
+    </section>
+
+    <section class="stats__bloque" *ngIf="frecuentes.length">
+      <h3>Lo que más compras</h3>
+      <div class="stats__fila" *ngFor="let f of frecuentes">
+        <span>{{f.nombre}}</span>
+        <strong>{{f.veces}} {{f.veces === 1 ? 'lista' : 'listas'}}</strong>
+      </div>
+    </section>
+
+    <section class="stats__bloque" *ngIf="porSeccion.length">
+      <h3>Por sección</h3>
+      <div class="stats__seccion" *ngFor="let s of porSeccion">
+        <div class="stats__seccion-texto">
+          <span>{{s.seccion}}</span>
+          <strong>{{s.porcentaje}}%</strong>
+        </div>
+        <div class="se-progreso">
+          <span [style.width.%]="s.porcentaje"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <ng-template #sinDatos>
+    <div class="empty">
+      <div class="empty-icono">
+        <ion-icon name="stats-chart-outline"></ion-icon>
+      </div>
+      <h3>Todavía no hay números</h3>
+      <p>Crea alguna lista y aquí verás qué compras más y cuánto llevas gastado.</p>
+    </div>
+  </ng-template>
+</ion-content>

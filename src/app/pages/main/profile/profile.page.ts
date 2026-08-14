@@ -10,6 +10,8 @@ import { Tema, ThemeService } from 'src/app/services/theme.service';
 import { PwaService } from 'src/app/services/pwa.service';
 import { MONEDAS, MonedaService } from 'src/app/services/moneda.service';
 import { RespaldoService } from 'src/app/services/respaldo.service';
+import { PapeleraComponent } from 'src/app/shared/components/papelera/papelera.component';
+import { EstadisticasComponent } from 'src/app/shared/components/estadisticas/estadisticas.component';
 import { TwoFactorComponent } from 'src/app/shared/components/two-factor/two-factor.component';
 import { VerifyCodeComponent } from 'src/app/shared/components/verify-code/verify-code.component';
 import { orderBy } from '@angular/fire/firestore';
@@ -77,12 +79,38 @@ export class ProfilePage implements OnInit, OnDestroy {
     this.monedaSvc.simbolo = event.detail.value;
   }
 
+  // ---- Papelera y estadísticas ----
+  get vivas(): List[] {
+    return this.lists.filter(l => !l.deletedAt);
+  }
+
+  get enPapelera(): List[] {
+    return this.lists.filter(l => l.deletedAt);
+  }
+
+  async verPapelera() {
+    await this.utilsSvc.presentModal({
+      component: PapeleraComponent,
+      componentProps: { listas: this.enPapelera },
+      cssClass: 'add-update-modal'
+    });
+  }
+
+  async verEstadisticas() {
+    await this.utilsSvc.presentModal({
+      component: EstadisticasComponent,
+      componentProps: { listas: this.lists },
+      cssClass: 'add-update-modal'
+    });
+  }
+
   // ---- Copia de seguridad ----
   exportar() {
-    if (!this.lists.length) {
+    if (!this.vivas.length) {
       return this.avisar('No tienes listas que exportar.', 'warning');
     }
-    const cuantas = this.respaldoSvc.exportar(this.lists);
+    // Lo de la papelera no se exporta: ya está borrado para el usuario
+    const cuantas = this.respaldoSvc.exportar(this.vivas);
     this.avisar(`${cuantas} ${cuantas === 1 ? 'lista exportada' : 'listas exportadas'}.`, 'success');
   }
 
