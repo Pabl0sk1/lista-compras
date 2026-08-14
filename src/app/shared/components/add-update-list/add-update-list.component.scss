@@ -168,6 +168,11 @@
 // ---- Sugerencias ----
 .sugerencias {
   margin-top: 14px;
+  // Las sugerencias y los items son dos cosas distintas y las dos son píldoras
+  // con borde: pegadas se leen como una sola lista. El margen inferior tiene
+  // que ganarle al de .items-lista, porque entre hermanos se colapsan y manda
+  // el mayor, no la suma.
+  margin-bottom: 24px;
 }
 
 .sugerencias__titulo {

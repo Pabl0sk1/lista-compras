@@ -49,15 +49,18 @@ export class ChangePasswordComponent {
 
     await this.utilsSvc.presentLoading();
 
+    let cambiada = false;
+
     try {
       await this.firebaseSvc.changePassword(this.form.value.actual, this.form.value.nueva);
+      cambiada = true;
 
       this.utilsSvc.dismissModal({ success: true });
       this.utilsSvc.presentToast({
-        message: 'Contraseña actualizada correctamente.',
+        message: 'Contraseña actualizada. Entra de nuevo con la nueva.',
         color: 'success',
         icon: 'checkmark-circle-outline',
-        duration: 2000,
+        duration: 3000,
         position: 'middle'
       });
 
@@ -80,5 +83,12 @@ export class ChangePasswordComponent {
     } finally {
       this.utilsSvc.dismissLoading();
     }
+
+    // Se cierra la sesión a propósito, y fuera del try: si alguien cambia la
+    // contraseña es porque cree que la anterior está comprometida, y quedarse
+    // dentro sin haber escrito nunca la nueva deja la duda de si cambió de
+    // verdad. Va después de cerrar el cargando, para no dejarlo colgado encima
+    // de la pantalla de acceso.
+    if (cambiada) await this.firebaseSvc.signOut();
   }
 }
