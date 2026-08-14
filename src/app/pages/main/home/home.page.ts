@@ -467,6 +467,12 @@ export class HomePage implements OnDestroy {
       },
       error: (err) => {
         this.loading = false;
+
+        // Al cerrar sesión la escucha sigue viva un instante y Firestore la
+        // rechaza: es lo esperado, no un fallo. Sin esto, salir de la cuenta
+        // dejaba siempre un error rojo en consola.
+        if (err?.code === 'permission-denied' && !this.firebaseSvc.getUid()) return;
+
         console.error('Error al obtener listas:', err);
       }
     });

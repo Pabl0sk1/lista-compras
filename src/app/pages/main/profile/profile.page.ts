@@ -394,6 +394,12 @@ export class ProfilePage implements OnDestroy {
         this.lists = res;
       },
       error: (err) => {
+        // Salir de la cuenta se hace desde esta misma pantalla, así que la
+        // escucha sigue viva un instante y Firestore la rechaza. Es lo
+        // esperado, no un fallo: sin esto, cerrar sesión dejaba siempre un
+        // error rojo en consola.
+        if (err?.code === 'permission-denied' && !this.firebaseSvc.getUid()) return;
+
         console.error('Error al obtener listas:', err);
       }
     });

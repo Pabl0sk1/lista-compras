@@ -43,6 +43,13 @@ export class UtilsService {
   }
 
   routerLink(url: string) {
+    // Ionic deja la pantalla anterior en el DOM y le pone aria-hidden. Si el
+    // botón que provocó el salto sigue teniendo el foco, queda un elemento
+    // enfocado dentro de algo oculto para los lectores de pantalla, y el
+    // navegador lo bloquea y avisa. Soltar el foco antes de navegar lo evita.
+    const enfocado = document.activeElement;
+    if (enfocado instanceof HTMLElement) enfocado.blur();
+
     return this.router.navigateByUrl(url);
   }
 
