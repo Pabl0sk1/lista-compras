@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { List, ListStatus } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -191,20 +191,143 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
+  // ---- Compartir con otra persona ----
+  esCompartida(list: List): boolean {
+    return !!list.sharedWith?.length;
+  }
+
+  soyDuenyo(list: List): boolean {
+    return this.firebaseSvc.soyDuenyo(list);
+  }
+
+  /**
+   * Comparte por correo. Se guarda el correo, no un uid, porque el cliente no
+   * puede resolver uno desde el otro: las reglas comparan con el correo del
+   * token de quien entra.
+   */
+  async compartirConAlguien(list: List) {
+    await this.utilsSvc.presentAlert({
+      header: 'Compartir lista',
+      message: 'Escribe el correo de la persona. Verá y podrá editar esta lista con su cuenta de ShopEasy.',
+      cssClass: 'custom-alert',
+      mode: 'ios',
+      inputs: [{ name: 'email', type: 'email', placeholder: 'correo@ejemplo.com' }],
+      buttons: [
+        { text: 'Cancelar', role: 'cancel', cssClass: 'cancel-button' },
+        {
+          text: 'Compartir',
+          cssClass: 'logout-button',
+          handler: (res) => {
+            const correo = (res.email ?? '').trim().toLowerCase();
+            if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) {
+              this.avisar('Ese correo no parece válido.', 'danger');
+              return false;
+            }
+            if (correo === this.user?.email?.toLowerCase()) {
+              this.avisar('Esa lista ya es tuya.', 'warning');
+              return false;
+            }
+            this.guardarReparto(list, [...(list.sharedWith ?? []), correo]);
+            return true;
+          }
+        }
+      ]
+    });
+  }
+
+  /** Ver con quién está compartida y quitar a alguien */
+  async gestionarAcceso(list: List) {
+    const correos = list.sharedWith ?? [];
+
+    await this.utilsSvc.presentActionSheet({
+      header: 'Compartida con',
+      cssClass: 'custom-sheet',
+      mode: 'ios',
+      buttons: [
+        ...correos.map(c => ({
+          text: `Quitar a ${c}`,
+          icon: 'person-remove-outline',
+          role: 'destructive',
+          handler: () => this.guardarReparto(list, correos.filter(x => x !== c))
+        })),
+        { text: 'Compartir con alguien más', icon: 'person-add-outline', handler: () => this.compartirConAlguien(list) },
+        { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
+      ]
+    });
+  }
+
+  private async guardarReparto(list: List, correos: string[]) {
+    try {
+      await this.utilsSvc.presentLoading();
+
+      // El dueño queda anotado para que el invitado sepa en qué cuenta escribir
+      await this.firebaseSvc.updateSubCollection(this.firebaseSvc.rutaDeLista(list), {
+        sharedWith: [...new Set(correos)],
+        owner: list.owner ?? this.firebaseSvc.getUid()
+      });
+
+      this.avisar(correos.length ? 'Acceso actualizado.' : 'Ya no está compartida.', 'success');
+    } catch (error) {
+      this.avisar(this.firebaseSvc.translateErrorMessage(error?.code), 'danger');
+    } finally {
+      this.utilsSvc.dismissLoading();
+    }
+  }
+
+  /** Un invitado no puede borrar la lista de otro, pero sí quitarse a sí mismo */
+  salirDeLaLista(list: List) {
+    this.utilsSvc.presentAlert({
+      header: 'Salir de la lista',
+      message: `Dejarás de ver "${list.title}". Su dueño puede volver a invitarte.`,
+      cssClass: 'custom-alert peligro',
+      mode: 'ios',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel', cssClass: 'cancel-button' },
+        {
+          text: 'Salir',
+          cssClass: 'logout-button',
+          handler: async () => {
+            const mio = this.user?.email?.toLowerCase();
+            await this.firebaseSvc.updateSubCollection(this.firebaseSvc.rutaDeLista(list), {
+              sharedWith: (list.sharedWith ?? []).filter(c => c !== mio)
+            });
+            this.avisar('Has salido de la lista.', 'success');
+          }
+        }
+      ]
+    });
+  }
+
   // ---- Opciones de una lista ----
   async opcionesLista(list: List) {
+    const propia = this.soyDuenyo(list);
+
+    // A un invitado no se le ofrecen acciones que las reglas van a rechazar
+    const botones: any[] = [
+      { text: 'Modo compra', icon: 'basket-outline', handler: () => this.modoCompra(list) },
+      { text: 'Repetir lista', icon: 'copy-outline', handler: () => this.duplicarLista(list) },
+      { text: 'Compartir por mensaje', icon: 'share-outline', handler: () => this.compartirLista(list) }
+    ];
+
+    if (propia) {
+      botones.push(
+        { text: 'Guardar como plantilla', icon: 'bookmark-outline', handler: () => this.guardarComoPlantilla(list) },
+        this.esCompartida(list)
+          ? { text: 'Gestionar acceso', icon: 'people-outline', handler: () => this.gestionarAcceso(list) }
+          : { text: 'Compartir con alguien', icon: 'person-add-outline', handler: () => this.compartirConAlguien(list) },
+        { text: 'Eliminar', icon: 'trash-outline', role: 'destructive', handler: () => this.confirmDeleteList(list) }
+      );
+    } else {
+      botones.push({ text: 'Salir de la lista', icon: 'exit-outline', role: 'destructive', handler: () => this.salirDeLaLista(list) });
+    }
+
+    botones.push({ text: 'Cancelar', icon: 'close-outline', role: 'cancel' });
+
     await this.utilsSvc.presentActionSheet({
       header: list.title,
       cssClass: 'custom-sheet',
       mode: 'ios',
-      buttons: [
-        { text: 'Modo compra', icon: 'basket-outline', handler: () => this.modoCompra(list) },
-        { text: 'Repetir lista', icon: 'copy-outline', handler: () => this.duplicarLista(list) },
-        { text: 'Guardar como plantilla', icon: 'bookmark-outline', handler: () => this.guardarComoPlantilla(list) },
-        { text: 'Compartir', icon: 'share-outline', handler: () => this.compartirLista(list) },
-        { text: 'Eliminar', icon: 'trash-outline', role: 'destructive', handler: () => this.confirmDeleteList(list) },
-        { text: 'Cancelar', icon: 'close-outline', role: 'cancel' }
-      ]
+      buttons: botones
     });
   }
 
@@ -326,10 +449,20 @@ export class HomePage implements OnInit, OnDestroy {
     // Suscripción viva: antes se cortaba tras la primera lectura, así que un
     // cambio hecho en otro dispositivo (o en otra pestaña) no llegaba hasta
     // recargar. Se cierra al salir de la página, en ionViewWillLeave.
+    //
+    // Son dos orígenes: lo mío y lo que otros me han compartido, que vive en
+    // sus cuentas y llega por consulta de grupo.
     this.sub?.unsubscribe();
-    this.sub = this.firebaseSvc.getSubcollection(path, query).subscribe({
-      next: (res: List[]) => {
-        this.lists = this.ordenarPorUrgencia(res);
+    this.sub = combineLatest([
+      this.firebaseSvc.getSubcollection(path, query),
+      this.firebaseSvc.getListasCompartidasConmigo()
+    ]).subscribe({
+      next: ([propias, compartidas]: [List[], List[]]) => {
+        // Por id, no vaya a ser que una lista llegue por los dos caminos
+        const porId = new Map<string, List>();
+        for (const l of [...propias, ...compartidas]) porId.set(l.id, l);
+
+        this.lists = this.ordenarPorUrgencia([...porId.values()]);
         this.loading = false;
       },
       error: (err) => {
@@ -437,7 +570,7 @@ export class HomePage implements OnInit, OnDestroy {
    * datos de forma definitiva.
    */
   deleteList(list: List) {
-    let path = `users/${this.firebaseSvc.getUid()}/lists/${list.id}`;
+    let path = this.firebaseSvc.rutaDeLista(list);
     this.utilsSvc.presentLoading();
 
     this.firebaseSvc.updateSubCollection(path, { ...this.sinId(list), deletedAt: new Date().toISOString() }).then(() => {
@@ -473,7 +606,7 @@ export class HomePage implements OnInit, OnDestroy {
   /** La lista sigue existiendo: basta con quitarle la marca de la papelera */
   private async restaurarLista(list: List) {
     try {
-      await this.firebaseSvc.restaurarDeLaPapelera(`users/${this.firebaseSvc.getUid()}/lists/${list.id}`);
+      await this.firebaseSvc.restaurarDeLaPapelera(this.firebaseSvc.rutaDeLista(list));
       this.avisar('Lista restaurada.', 'success');
     } catch (error) {
       this.avisar('No se pudo restaurar la lista.', 'danger');

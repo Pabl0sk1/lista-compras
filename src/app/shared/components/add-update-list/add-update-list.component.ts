@@ -5,7 +5,7 @@ import { CATEGORIAS, Item, List, ListStatus } from 'src/app/models/list.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { MonedaService } from 'src/app/services/moneda.service';
-import { Timestamp } from '@angular/fire/firestore';
+import { deleteField, Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-add-update-list',
@@ -106,7 +106,11 @@ export class AddUpdateListComponent implements OnInit {
         ...(item.price ? { price: item.price } : {}),
         ...(item.category ? { category: item.category } : {})
       })),
-      ...(this.nota.trim() ? { note: this.nota.trim().slice(0, 500) } : {})
+      // Al actualizar se fusiona, así que omitir la nota vacía dejaría la
+      // anterior puesta para siempre: hay que pedir que se borre.
+      ...(this.nota.trim()
+        ? { note: this.nota.trim().slice(0, 500) }
+        : (this.list ? { note: deleteField() } : {}))
     };
   }
 
@@ -180,7 +184,7 @@ export class AddUpdateListComponent implements OnInit {
   }
 
   updateList() {
-    let path = `users/${this.firebaseSvc.getUid()}/lists/${this.list.id}`;
+    let path = this.firebaseSvc.rutaDeLista(this.list);
     this.utilsSvc.presentLoading();
 
     this.firebaseSvc.updateSubCollection(path, this.buildPayload()).then(() => {

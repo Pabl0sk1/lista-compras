@@ -9,6 +9,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:reglas": "firebase emulators:exec --only firestore \"node test/reglas-firestore.mjs\"",
     "lint": "ng lint"
   },
   "private": true,

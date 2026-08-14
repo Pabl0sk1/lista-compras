@@ -45,6 +45,14 @@
                 [class.completo]="list.status === 'Completo'">{{list.status}}</span>
             </ng-template>
             <span class="lista-card__fecha" *ngIf="list?.dateHour">{{formatDate(list.dateHour)}}</span>
+
+            <!-- Compartida: da igual si la compartes tú o te la compartieron,
+                 lo importante es saber que no estás solo en ella -->
+            <span class="lista-card__compartida" *ngIf="esCompartida(list) || !soyDuenyo(list)"
+              [title]="soyDuenyo(list) ? 'La compartes con alguien' : 'Compartida contigo'">
+              <ion-icon name="people" aria-hidden="true"></ion-icon>
+              {{soyDuenyo(list) ? 'Compartida' : 'De otra persona'}}
+            </span>
           </div>
 
           <div class="lista-card__progreso">

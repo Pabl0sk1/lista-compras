@@ -63,7 +63,7 @@ service cloud.firestore {
     }
 
     function validList() {
-      return incoming().keys().hasOnly(['id', 'title', 'status', 'dateHour', 'items', 'note', 'deletedAt', 'template'])
+      return incoming().keys().hasOnly(['id', 'title', 'status', 'dateHour', 'items', 'note', 'deletedAt', 'template', 'owner', 'sharedWith'])
         && incoming().title is string
         && incoming().title.size() > 0
         && incoming().title.size() <= 100
@@ -78,7 +78,40 @@ service cloud.firestore {
         // La papelera es un borrado suave: se marca la fecha en vez de borrar
         && (!('deletedAt' in incoming())
             || (incoming().deletedAt is string && incoming().deletedAt.size() <= 40))
-        && (!('template' in incoming()) || incoming().template is bool);
+        && (!('template' in incoming()) || incoming().template is bool)
+        && (!('owner' in incoming())
+            || (incoming().owner is string && incoming().owner.size() <= 40))
+        && (!('sharedWith' in incoming())
+            || (incoming().sharedWith is list && incoming().sharedWith.size() <= 20));
+    }
+
+    // ---- Compartir ----
+    // La lista guarda correos, no uid: el cliente no puede resolver un uid
+    // desde un correo, pero las reglas sí conocen el correo del token.
+    function miCorreo() {
+      return request.auth.token.email;
+    }
+
+    function conCorreoVerificado() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function esInvitado() {
+      return conCorreoVerificado() && miCorreo() in resource.data.get('sharedWith', []);
+    }
+
+    /** Un invitado edita la lista, pero no decide con quién más se comparte */
+    function noTocaElReparto() {
+      return request.resource.data.get('sharedWith', []) == resource.data.get('sharedWith', [])
+        && request.resource.data.get('owner', '') == resource.data.get('owner', '');
+    }
+
+    /** Salirse de una lista compartida: solo puede quitarse a sí mismo */
+    function saliendoDeLaLista() {
+      return !(miCorreo() in request.resource.data.get('sharedWith', []))
+        && request.resource.data.get('sharedWith', []).size()
+           == resource.data.get('sharedWith', []).size() - 1
+        && request.resource.data.get('owner', '') == resource.data.get('owner', '');
     }
 
     match /users/{uid} {
@@ -89,10 +122,22 @@ service cloud.firestore {
       allow delete: if isOwner(uid);
 
       match /lists/{listId} {
-        allow read: if isOwner(uid);
-        allow create, update: if isOwner(uid) && validList();
+        allow read: if isOwner(uid) || esInvitado();
+        allow create: if isOwner(uid) && validList();
+        allow update: if (isOwner(uid) && validList())
+          // El invitado edita el contenido, pero no el reparto ni el dueño
+          || (esInvitado() && validList() && noTocaElReparto())
+          // ...salvo para quitarse a sí mismo
+          || (esInvitado() && validList() && saliendoDeLaLista());
+        // Borrar la lista es cosa del dueño; el invitado solo puede salirse
         allow delete: if isOwner(uid);
       }
+    }
+
+    // Consulta de grupo: así un invitado encuentra las listas compartidas con
+    // él sin saber en qué cuenta viven. Solo ve aquellas donde figura su correo.
+    match /{ruta=**}/lists/{listId} {
+      allow read: if esInvitado();
     }
 
     // Todo lo demás queda cerrado

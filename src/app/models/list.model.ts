@@ -39,5 +39,15 @@ export interface List {
     /** Momento en que se mandó a la papelera. Sin este campo, la lista está viva. */
     deletedAt?: string,
     /** Plantilla: no aparece en el listado, sirve para crear listas nuevas */
-    template?: boolean
+    template?: boolean,
+    /**
+     * Correos con los que está compartida.
+     *
+     * Se guardan correos y no uid a propósito: Firebase no deja resolver un uid
+     * desde el cliente (permitiría averiguar qué correos están registrados),
+     * mientras que las reglas sí pueden comparar con el correo del token.
+     */
+    sharedWith?: string[],
+    /** uid del dueño. Necesario para que un invitado sepa dónde escribir. */
+    owner?: string
 }

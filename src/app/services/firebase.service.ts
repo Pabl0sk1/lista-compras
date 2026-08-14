@@ -4,7 +4,8 @@ import {
   sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider
 } from '@angular/fire/auth';
 import { User } from '../models/user.model';
-import { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, getFirestore, collection, collectionData, query } from '@angular/fire/firestore';
+import { doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, deleteField, getFirestore, collection, collectionData, collectionGroup, query, where } from '@angular/fire/firestore';
+import { of } from 'rxjs';
 import { UtilsService } from './utils.service';
 
 @Injectable({
@@ -157,6 +158,36 @@ export class FirebaseService {
   getSubcollection(path: string, collectionQuery: any[] = []) {
     const ref = collection(getFirestore(), path);
     return collectionData(query(ref, ...collectionQuery), { idField: 'id' });
+  }
+
+  /**
+   * Ruta real de una lista. Una lista compartida vive en la cuenta de su dueño,
+   * así que un invitado no puede escribir en su propia ruta: hay que usar la
+   * del dueño.
+   */
+  rutaDeLista(list: { id: string, owner?: string }): string {
+    return `users/${list.owner ?? this.getUid()}/lists/${list.id}`;
+  }
+
+  /** ¿Soy el dueño de esta lista o me la han compartido? */
+  soyDuenyo(list: { owner?: string }): boolean {
+    return !list.owner || list.owner === this.getUid();
+  }
+
+  /**
+   * Listas que otros han compartido conmigo. Consulta de grupo: busca en las
+   * subcolecciones `lists` de TODAS las cuentas, y las reglas solo devuelven
+   * aquellas donde figura mi correo.
+   */
+  getListasCompartidasConmigo() {
+    const correo = getAuth().currentUser?.email?.toLowerCase();
+    if (!correo) return of([] as any[]);
+
+    const consulta = query(
+      collectionGroup(getFirestore(), 'lists'),
+      where('sharedWith', 'array-contains', correo)
+    );
+    return collectionData(consulta, { idField: 'id' });
   }
 
   addToSubcollection(path: string, data: any) {

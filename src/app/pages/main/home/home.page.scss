@@ -162,3 +162,16 @@ ion-fab-button {
   flex: none;
   height: 40px;
 }
+
+.lista-card__compartida {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+
+  ion-icon {
+    font-size: 13px;
+  }
+}

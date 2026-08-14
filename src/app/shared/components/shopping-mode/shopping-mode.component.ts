@@ -138,7 +138,7 @@ export class ShoppingModeComponent implements OnInit, OnDestroy {
       // Se escribe el documento entero, así que hay que arrastrar todo lo que
       // esta pantalla no toca (precio, sección, nota). Omitirlo lo borraría en
       // silencio con solo abrir el modo compra y cerrarlo.
-      await this.firebaseSvc.updateSubCollection(`users/${uid}/lists/${this.list.id}`, {
+      await this.firebaseSvc.updateSubCollection(this.firebaseSvc.rutaDeLista(this.list), {
         title: this.list.title,
         status: completos ? ListStatus.Completed : ListStatus.Active,
         dateHour: this.list.dateHour,
