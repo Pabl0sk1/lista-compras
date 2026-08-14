@@ -520,3 +520,55 @@ ion-tab-button {
   --width: 100%;
   --border-radius: 0;
 }
+
+// ---------- Barra de desplazamiento ----------
+// Solo con ratón. En táctil la barra nativa aparece al arrastrar y se esconde
+// sola; forzarla ahí la dejaría fija robando ancho y estorbando al dedo.
+@media (pointer: fine) {
+
+  // `scrollbar-color` sí se hereda dentro del shadow DOM de los componentes de
+  // Ionic, pero `scrollbar-width` no: por eso el contenido se apunta con
+  // ::part(scroll), que es lo único que alcanza a las dos.
+  :root,
+  ion-content::part(scroll),
+  ion-textarea::part(native),
+  textarea,
+  .alert-message,
+  .action-sheet-group {
+    scrollbar-width: thin;
+    scrollbar-color: var(--se-scroll-pulgar) var(--se-scroll-pista);
+  }
+
+  // Safari anterior a 18.2 no entiende las dos propiedades de arriba. Ahí no se
+  // puede entrar al shadow DOM, así que ion-content se queda con la barra del
+  // sistema; el resto sí se puede vestir.
+  @supports not (scrollbar-color: red transparent) {
+
+    :root,
+    textarea,
+    .alert-message,
+    .action-sheet-group {
+      &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--se-scroll-pista);
+      }
+
+      // El borde transparente con background-clip deja aire a los lados: la
+      // barra queda como una pastilla fina y no pegada al canto.
+      &::-webkit-scrollbar-thumb {
+        background: var(--se-scroll-pulgar);
+        background-clip: content-box;
+        border: 3px solid transparent;
+        border-radius: 999px;
+      }
+
+      &::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+    }
+  }
+}
