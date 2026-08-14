@@ -9,6 +9,8 @@ import { AddUpdateListComponent } from './components/add-update-list/add-update-
 import { CustomInputListComponent } from './components/custom-input-list/custom-input-list.component';
 import { EditProfileComponent } from './components/edit-profile/edit-profile.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
+import { TwoFactorComponent } from './components/two-factor/two-factor.component';
+import { VerifyCodeComponent } from './components/verify-code/verify-code.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +20,9 @@ import { ChangePasswordComponent } from './components/change-password/change-pas
     AddUpdateListComponent,
     EditProfileComponent,
     CustomInputListComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    TwoFactorComponent,
+    VerifyCodeComponent
   ],
   exports: [
     HeaderComponent,
@@ -28,6 +32,8 @@ import { ChangePasswordComponent } from './components/change-password/change-pas
     EditProfileComponent,
     CustomInputListComponent,
     ChangePasswordComponent,
+    TwoFactorComponent,
+    VerifyCodeComponent,
     ReactiveFormsModule
   ],
   imports: [

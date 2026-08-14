@@ -1,0 +1,26 @@
+<ion-content>
+  <div class="verificar">
+    <div class="verificar__icono">
+      <ion-icon name="shield-checkmark-outline" aria-hidden="true"></ion-icon>
+    </div>
+
+    <h2>{{titulo}}</h2>
+    <p class="verificar__texto">{{descripcion}}</p>
+
+    <ion-input class="verificar__codigo" inputmode="numeric" maxlength="9" placeholder="000000" [(ngModel)]="codigo"
+      (keyup.enter)="comprobar()" autofocus></ion-input>
+
+    <p class="verificar__ayuda" *ngIf="recuperacion">
+      ¿Perdiste el móvil? Escribe aquí tu código de recuperación.
+    </p>
+
+    <ion-button expand="block" mode="ios" color="primary" class="verificar__enviar" [disabled]="!codigo || comprobando"
+      (click)="comprobar()">
+      Verificar
+    </ion-button>
+
+    <ion-button expand="block" mode="ios" fill="clear" color="medium" (click)="cancelar()">
+      Cancelar
+    </ion-button>
+  </div>
+</ion-content>

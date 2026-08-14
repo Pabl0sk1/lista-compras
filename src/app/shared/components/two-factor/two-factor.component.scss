@@ -1,0 +1,111 @@
+.dosfactores {
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.dosfactores__intro {
+  margin: 0 0 20px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--se-texto-suave);
+}
+
+.dosfactores__qr {
+  display: inline-block;
+  padding: 12px;
+  // El QR se genera en negro sobre blanco: necesita fondo claro también en
+  // modo oscuro, o los lectores no lo distinguen
+  background: #fff;
+  border-radius: var(--se-radio);
+  border: 1px solid var(--se-borde);
+
+  img {
+    display: block;
+    width: 190px;
+    height: 190px;
+    image-rendering: pixelated; // sin suavizado, se lee mejor
+  }
+}
+
+.dosfactores__o {
+  margin: 20px 0 8px;
+  font-size: 13px;
+  color: var(--se-texto-suave);
+}
+
+.dosfactores__secreto {
+  display: block;
+  padding: 12px;
+  border-radius: var(--se-radio-sm);
+  background: var(--se-superficie-alt);
+  border: 1px solid var(--se-borde);
+  color: var(--se-texto);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 15px;
+  letter-spacing: .08em;
+  word-break: break-all;
+
+  &--grande {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    margin-bottom: 18px;
+  }
+}
+
+.dosfactores__campo {
+  margin-top: 26px;
+
+  p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: var(--se-texto-suave);
+  }
+}
+
+.dosfactores__codigo {
+  --background: var(--se-superficie);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border: 1px solid var(--se-borde);
+  border-radius: var(--se-radio);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: .35em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.dosfactores__ok {
+  margin-bottom: 24px;
+
+  ion-icon {
+    font-size: 54px;
+    color: var(--ion-color-success);
+  }
+
+  h3 {
+    margin: 10px 0 4px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--se-texto);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--se-texto-suave);
+  }
+}
+
+.dosfactores__aviso {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: var(--se-radio-sm);
+  background: rgba(var(--ion-color-warning-rgb), .12);
+  border: 1px solid rgba(var(--ion-color-warning-rgb), .3);
+  color: var(--se-texto);
+  font-size: 13.5px;
+  line-height: 1.5;
+  text-align: left;
+}

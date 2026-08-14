@@ -7,6 +7,8 @@ import { EditProfileComponent } from 'src/app/shared/components/edit-profile/edi
 import { ChangePasswordComponent } from 'src/app/shared/components/change-password/change-password.component';
 import { Tema, ThemeService } from 'src/app/services/theme.service';
 import { PwaService } from 'src/app/services/pwa.service';
+import { TwoFactorComponent } from 'src/app/shared/components/two-factor/two-factor.component';
+import { VerifyCodeComponent } from 'src/app/shared/components/verify-code/verify-code.component';
 import { orderBy } from '@angular/fire/firestore';
 import { deleteUser } from '@angular/fire/auth';
 
@@ -52,6 +54,62 @@ export class ProfilePage implements OnInit {
 
   cambiarTema(event: CustomEvent) {
     this.themeSvc.setTema(event.detail.value as Tema);
+  }
+
+  // ---- Verificación en dos pasos ----
+  get dosFactoresActivo(): boolean {
+    return !!this.user?.twoFactor?.enabled;
+  }
+
+  async alternarDosFactores() {
+    return this.dosFactoresActivo ? this.desactivarDosFactores() : this.activarDosFactores();
+  }
+
+  private async activarDosFactores() {
+    const res = await this.utilsSvc.presentModal({
+      component: TwoFactorComponent,
+      cssClass: 'add-update-modal'
+    });
+
+    if (res?.activado) {
+      await this.getUser();
+      this.firebaseSvc.marcarDosFactoresSuperado();
+      this.avisar('Verificación en dos pasos activada.', 'success');
+    }
+  }
+
+  /**
+   * Para desactivarla se exige un código válido. Si bastara con pulsar el
+   * botón, cualquiera con el móvil desbloqueado la quitaría, que es justo de
+   * lo que protege.
+   */
+  private async desactivarDosFactores() {
+    const config = await this.firebaseSvc.getDosFactores();
+    if (!config?.enabled) return;
+
+    const res = await this.utilsSvc.presentModal({
+      component: VerifyCodeComponent,
+      componentProps: {
+        secreto: config.secret,
+        recuperacion: config.recovery,
+        titulo: 'Desactivar la verificación',
+        descripcion: 'Escribe un código de tu app de autenticación para confirmar que eres tú.'
+      },
+      cssClass: 'add-update-modal'
+    });
+
+    if (!res?.ok) return;
+
+    try {
+      await this.utilsSvc.presentLoading();
+      await this.firebaseSvc.guardarDosFactores(null);
+      await this.getUser();
+      this.avisar('Verificación en dos pasos desactivada.', 'success');
+    } catch (error) {
+      this.avisar(this.firebaseSvc.translateErrorMessage(error?.code), 'danger');
+    } finally {
+      this.utilsSvc.dismissLoading();
+    }
   }
 
   // ---- Instalación de la app ----
@@ -163,6 +221,12 @@ export class ProfilePage implements OnInit {
     const uid = this.firebaseSvc.getUid();
     const perfil: any = { uid, email: user.email, name: user.name };
     if (user.photo) perfil.photo = user.photo;
+
+    // setDocument reemplaza el documento entero: hay que arrastrar la
+    // configuración de dos factores o cambiar la foto la desactivaría. Se lee
+    // de Firestore porque la copia local no guarda el secreto.
+    const dosFactores = await this.firebaseSvc.getDosFactores(uid);
+    if (dosFactores?.enabled) perfil.twoFactor = dosFactores;
 
     await this.firebaseSvc.setDocument(`users/${uid}`, perfil);
     this.user = perfil;

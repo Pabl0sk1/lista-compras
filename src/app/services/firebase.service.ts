@@ -41,6 +41,8 @@ export class FirebaseService {
   async clearSession() {
     await getAuth().signOut();
     localStorage.removeItem('user');
+    // El segundo factor se vuelve a pedir en el próximo inicio de sesión
+    localStorage.removeItem('2fa');
   }
 
   //Cerrar Sesión
@@ -93,8 +95,57 @@ export class FirebaseService {
     if (!uid) return null;
 
     const profile = await this.getDocument(`users/${uid}`) as User;
-    if (profile) this.utilsSvc.saveInLocalStorage('user', profile);
+    if (profile) this.guardarPerfilLocal(profile);
     return profile ?? null;
+  }
+
+  /**
+   * Copia local del perfil SIN el secreto de dos factores ni el código de
+   * recuperación: localStorage lo lee cualquier script de la página, y ahí
+   * esos valores permitirían generar códigos válidos.
+   */
+  guardarPerfilLocal(profile: User) {
+    const { twoFactor, ...resto } = profile;
+    this.utilsSvc.saveInLocalStorage('user', {
+      ...resto,
+      ...(twoFactor?.enabled ? { twoFactor: { enabled: true } } : {})
+    });
+  }
+
+  /** Lee la configuración completa de dos factores (con secreto) de Firestore */
+  async getDosFactores(uid?: string): Promise<{ enabled: boolean, secret?: string, recovery?: string } | null> {
+    const id = uid ?? this.getUid();
+    if (!id) return null;
+    const perfil = await this.getDocument(`users/${id}`) as User;
+    return perfil?.twoFactor ?? null;
+  }
+
+  /** Activa o desactiva la verificación en dos pasos conservando el resto del perfil */
+  async guardarDosFactores(dosFactores: { enabled: boolean, secret?: string, recovery?: string } | null) {
+    const uid = this.getUid();
+    if (!uid) throw { code: 'auth/no-current-user' };
+
+    const perfil = await this.getDocument(`users/${uid}`) as User;
+    const actualizado: any = {
+      uid,
+      email: perfil?.email ?? getAuth().currentUser?.email,
+      name: perfil?.name
+    };
+    if (perfil?.photo) actualizado.photo = perfil.photo;
+    if (dosFactores?.enabled) actualizado.twoFactor = dosFactores;
+
+    await this.setDocument(`users/${uid}`, actualizado);
+    this.guardarPerfilLocal(actualizado);
+    return actualizado as User;
+  }
+
+  /** Marca que esta sesión ya superó el segundo factor */
+  marcarDosFactoresSuperado() {
+    localStorage.setItem('2fa', this.getUid() ?? '');
+  }
+
+  dosFactoresSuperado(): boolean {
+    return !!this.getUid() && localStorage.getItem('2fa') === this.getUid();
   }
 
   //Setear documento

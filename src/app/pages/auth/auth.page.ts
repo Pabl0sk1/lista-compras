@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { VerifyCodeComponent } from 'src/app/shared/components/verify-code/verify-code.component';
 
 @Component({
   selector: 'app-auth',
@@ -66,6 +67,43 @@ export class AuthPage implements OnInit {
     }
   }
 
+  /**
+   * Pide el código de la app de autenticación. Si no lo supera se cierra la
+   * sesión: dejar la sesión de Firebase abierta tras fallar el segundo factor
+   * dejaría entrar recargando la página.
+   */
+  private async pedirSegundoFactor(user: User): Promise<boolean> {
+    const res = await this.utilsSvc.presentModal({
+      component: VerifyCodeComponent,
+      componentProps: {
+        secreto: user.twoFactor?.secret,
+        recuperacion: user.twoFactor?.recovery
+      },
+      backdropDismiss: false,
+      cssClass: 'add-update-modal'
+    });
+
+    if (!res?.ok) {
+      await this.firebaseSvc.clearSession();
+      return false;
+    }
+
+    // El código de recuperación es de un solo uso: al gastarlo se desactiva
+    // la verificación para que el usuario no se quede fuera.
+    if (res.conRecuperacion) {
+      await this.firebaseSvc.guardarDosFactores(null);
+      this.utilsSvc.presentToast({
+        message: 'Has usado tu código de recuperación. La verificación en dos pasos se ha desactivado.',
+        color: 'warning',
+        icon: 'alert-circle-outline',
+        duration: 5000,
+        position: 'middle'
+      });
+    }
+
+    return true;
+  }
+
   async getUserInfo(uid: string) {
     if (this.form.valid) {
 
@@ -74,8 +112,18 @@ export class AuthPage implements OnInit {
 
       let path = `users/${uid}`;
 
-      this.firebaseSvc.getDocument(path).then((user: User) => {
-        this.utilsSvc.saveInLocalStorage('user', user);
+      this.firebaseSvc.getDocument(path).then(async (user: User) => {
+
+        // Segundo factor, si el usuario lo tiene activado
+        if (user?.twoFactor?.enabled) {
+          loading.dismiss();
+          const superado = await this.pedirSegundoFactor(user);
+          if (!superado) return;
+          await loading.present();
+        }
+
+        this.firebaseSvc.guardarPerfilLocal(user);
+        this.firebaseSvc.marcarDosFactoresSuperado();
         this.utilsSvc.routerLink('/main/home');
         this.form.reset();
 

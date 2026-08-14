@@ -1,0 +1,56 @@
+<app-header [isModal]="true" title="Verificación en dos pasos"></app-header>
+
+<ion-content>
+  <!-- Paso 1: escanear y confirmar -->
+  <div class="dosfactores" *ngIf="paso === 1">
+    <p class="dosfactores__intro">
+      Escanea este código con <b>Google Authenticator</b>, <b>Authy</b> o la app de
+      autenticación que uses.
+    </p>
+
+    <div class="dosfactores__qr">
+      <img [src]="qr" alt="Código QR para configurar la verificación en dos pasos" />
+    </div>
+
+    <p class="dosfactores__o">¿No puedes escanear? Escribe esta clave:</p>
+    <code class="dosfactores__secreto">{{secretoLegible}}</code>
+
+    <div class="dosfactores__campo">
+      <p>Ahora escribe el código de 6 dígitos que te muestra la app:</p>
+      <ion-input class="dosfactores__codigo" inputmode="numeric" maxlength="6" placeholder="000000"
+        [(ngModel)]="codigo" (keyup.enter)="confirmar()"></ion-input>
+    </div>
+  </div>
+
+  <!-- Paso 2: código de recuperación -->
+  <div class="dosfactores" *ngIf="paso === 2">
+    <div class="dosfactores__ok">
+      <ion-icon name="shield-checkmark" aria-hidden="true"></ion-icon>
+      <h3>Activada</h3>
+      <p>A partir de ahora te pediremos un código al iniciar sesión.</p>
+    </div>
+
+    <div class="dosfactores__aviso">
+      <b>Guarda este código de recuperación.</b> Es la única forma de entrar si
+      pierdes el móvil. No volveremos a mostrártelo.
+    </div>
+
+    <code class="dosfactores__secreto dosfactores__secreto--grande">{{recuperacion}}</code>
+
+    <ion-button expand="block" fill="outline" mode="ios" color="medium" (click)="copiarRecuperacion()">
+      <ion-icon slot="start" name="copy-outline"></ion-icon>
+      Copiar código
+    </ion-button>
+  </div>
+</ion-content>
+
+<ion-footer class="modal-pie">
+  <ion-button *ngIf="paso === 1" expand="block" mode="ios" color="primary" [disabled]="codigo.length !== 6 || comprobando"
+    (click)="confirmar()">
+    Activar
+  </ion-button>
+
+  <ion-button *ngIf="paso === 2" expand="block" mode="ios" color="primary" (click)="cerrar()">
+    Ya lo guardé
+  </ion-button>
+</ion-footer>

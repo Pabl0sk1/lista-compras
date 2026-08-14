@@ -61,8 +61,12 @@ export class EditProfileComponent implements OnInit {
     });
   }
 
-  updateProfile(uid: string) {
+  async updateProfile(uid: string) {
     let path = `users/${uid}`;
+
+    // Igual que la foto: setDocument reemplaza el documento, así que la
+    // configuración de dos factores tiene que viajar en el payload.
+    const dosFactores = await this.firebaseSvc.getDosFactores(uid);
 
     // Payload explícito: uid y email se toman de la sesión, no del formulario.
     // La foto se arrastra tal cual: setDocument reemplaza el documento entero,
@@ -73,6 +77,7 @@ export class EditProfileComponent implements OnInit {
       name: this.form.value.name
     };
     if (this.user.photo) profile.photo = this.user.photo;
+    if (dosFactores?.enabled) profile.twoFactor = dosFactores;
 
     this.firebaseSvc.setDocument(path, profile).then(() => {
       this.user.name = this.form.value.name;

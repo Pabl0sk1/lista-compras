@@ -35,9 +35,22 @@ service cloud.firestore {
             && incoming().photo.matches('data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]*'));
     }
 
+    // Verificación en dos pasos. El secreto se guarda aquí, donde solo lo lee
+    // su dueño; se acota el tamaño para que el campo no se use como almacén.
+    function validTwoFactor() {
+      return !('twoFactor' in incoming())
+        || (incoming().twoFactor is map
+            && incoming().twoFactor.keys().hasOnly(['enabled', 'secret', 'recovery'])
+            && incoming().twoFactor.enabled is bool
+            && (!('secret' in incoming().twoFactor)
+                || (incoming().twoFactor.secret is string && incoming().twoFactor.secret.size() <= 64))
+            && (!('recovery' in incoming().twoFactor)
+                || (incoming().twoFactor.recovery is string && incoming().twoFactor.recovery.size() <= 64)));
+    }
+
     // El perfil no puede contener contraseñas ni suplantar a otro usuario
     function validProfile(uid) {
-      return incoming().keys().hasOnly(['uid', 'email', 'name', 'photo'])
+      return incoming().keys().hasOnly(['uid', 'email', 'name', 'photo', 'twoFactor'])
         && incoming().keys().hasAll(['uid', 'email', 'name'])
         && incoming().uid == uid
         && incoming().email is string
@@ -45,7 +58,8 @@ service cloud.firestore {
         && incoming().name is string
         && incoming().name.size() >= 4
         && incoming().name.size() <= 50
-        && validPhoto();
+        && validPhoto()
+        && validTwoFactor();
     }
 
     function validList() {

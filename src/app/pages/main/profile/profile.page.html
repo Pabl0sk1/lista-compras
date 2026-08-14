@@ -65,6 +65,16 @@
         <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
       </button>
 
+      <button class="perfil__accion" (click)="alternarDosFactores()">
+        <ion-icon [name]="dosFactoresActivo ? 'shield-checkmark' : 'shield-outline'"
+          [class.perfil__icono--ok]="dosFactoresActivo"></ion-icon>
+        <span>
+          Verificación en dos pasos
+          <small class="perfil__estado">{{dosFactoresActivo ? 'Activada' : 'Desactivada'}}</small>
+        </span>
+        <ion-icon class="perfil__flecha" name="chevron-forward"></ion-icon>
+      </button>
+
       <button class="perfil__accion" (click)="signOut()">
         <ion-icon name="log-out-outline"></ion-icon>
         <span>Cerrar sesión</span>

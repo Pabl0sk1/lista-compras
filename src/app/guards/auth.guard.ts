@@ -15,13 +15,34 @@ export const authGuard: CanActivateFn = (): Promise<boolean | UrlTree> => {
       unsubscribe();
 
       // Solo pasan usuarios autenticados y con el correo verificado.
-      if (auth && auth.emailVerified) {
+      if (!auth || !auth.emailVerified) {
+        await firebaseSvc.clearSession();
+        resolve(router.parseUrl('/auth'));
+        return;
+      }
+
+      // Segundo factor. Si ya se superó en esta sesión, adelante.
+      if (firebaseSvc.dosFactoresSuperado()) {
         resolve(true);
         return;
       }
 
-      await firebaseSvc.clearSession();
-      resolve(router.parseUrl('/auth'));
+      // Si no, hay que preguntarle a Firestore, no a localStorage: el usuario
+      // puede vaciarlo o editarlo desde el navegador, y entonces bastaría con
+      // eso para saltarse el código.
+      try {
+        const dosFactores = await firebaseSvc.getDosFactores();
+        if (dosFactores?.enabled) {
+          await firebaseSvc.clearSession();
+          resolve(router.parseUrl('/auth'));
+          return;
+        }
+      } catch {
+        // Sin conexión y sin caché no se puede comprobar: se deja pasar en vez
+        // de dejar al usuario fuera de sus propias listas.
+      }
+
+      resolve(true);
     });
   });
 };
