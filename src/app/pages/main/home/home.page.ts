@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { combineLatest, Subscription } from 'rxjs';
 import { List, ListStatus } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
@@ -15,7 +15,7 @@ import { orderBy } from '@angular/fire/firestore';
   styleUrls: ['./home.page.scss'],
   standalone: false
 })
-export class HomePage implements OnInit, OnDestroy {
+export class HomePage implements OnDestroy {
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
@@ -28,8 +28,6 @@ export class HomePage implements OnInit, OnDestroy {
 
   user = {} as User;
 
-  ngOnInit() {
-  }
 
   ionViewWillEnter() {
     this.getUser();
@@ -306,7 +304,9 @@ export class HomePage implements OnInit, OnDestroy {
     const botones: any[] = [
       { text: 'Modo compra', icon: 'basket-outline', handler: () => this.modoCompra(list) },
       { text: 'Repetir lista', icon: 'copy-outline', handler: () => this.duplicarLista(list) },
-      { text: 'Compartir por mensaje', icon: 'share-outline', handler: () => this.compartirLista(list) }
+      // "Enviar" y no "Compartir": manda el texto por WhatsApp y se acabó, no
+      // da acceso a nada. Llamar a las dos cosas "compartir" confundía.
+      { text: 'Enviar por mensaje', icon: 'share-outline', handler: () => this.compartirLista(list) }
     ];
 
     if (propia) {

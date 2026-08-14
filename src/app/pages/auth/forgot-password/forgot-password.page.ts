@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -9,7 +9,7 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./forgot-password.page.scss'],
   standalone: false
 })
-export class ForgotPasswordPage implements OnInit {
+export class ForgotPasswordPage {
 
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email])
@@ -18,8 +18,6 @@ export class ForgotPasswordPage implements OnInit {
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
 
-  ngOnInit() {
-  }
 
   async submit(){
     if(this.form.valid){

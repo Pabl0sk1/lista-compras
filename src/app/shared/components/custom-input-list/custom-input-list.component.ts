@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -7,7 +7,7 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./custom-input-list.component.scss'],
   standalone: false
 })
-export class CustomInputListComponent implements OnInit {
+export class CustomInputListComponent {
 
   @Input() control: FormControl;
   @Input() label: string;
@@ -17,5 +17,4 @@ export class CustomInputListComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() { }
 }

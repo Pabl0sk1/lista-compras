@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./header.component.scss'],
   standalone: false
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
 
   utilsSvc = inject(UtilsService);
 
@@ -20,7 +20,6 @@ export class HeaderComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() { }
 
   dismissModal() {
     this.utilsSvc.dismissModal();

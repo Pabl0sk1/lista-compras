@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -11,7 +11,7 @@ import { VerifyCodeComponent } from 'src/app/shared/components/verify-code/verif
   styleUrls: ['./auth.page.scss'],
   standalone: false
 })
-export class AuthPage implements OnInit {
+export class AuthPage {
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
@@ -23,8 +23,6 @@ export class AuthPage implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
 
   ionViewWillEnter() {
     this.form.reset();

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-main',
@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./main.page.scss'],
   standalone: false
 })
-export class MainPage implements OnInit {
+export class MainPage {
 
   pages = [
     { title: 'Inicio', url: 'home', icon: 'home-outline' },
@@ -15,6 +15,4 @@ export class MainPage implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
 }

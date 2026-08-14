@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { List } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
@@ -23,7 +23,7 @@ import { deleteUser } from '@angular/fire/auth';
   styleUrls: ['./profile.page.scss'],
   standalone: false
 })
-export class ProfilePage implements OnInit, OnDestroy {
+export class ProfilePage implements OnDestroy {
 
   user = {} as User;
   lists: List[] = [];
@@ -38,8 +38,6 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   @ViewChild('selectorFoto') selectorFoto!: ElementRef<HTMLInputElement>;
 
-  ngOnInit() {
-  }
 
   ionViewWillEnter() {
     this.getUser();

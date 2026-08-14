@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { sendEmailVerification } from '@angular/fire/auth';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/models/user.model';
@@ -11,7 +11,7 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./sign-up.page.scss'],
   standalone: false
 })
-export class SignUpPage implements OnInit {
+export class SignUpPage {
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
@@ -31,8 +31,6 @@ export class SignUpPage implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-  }
 
   confirmPasswordValidator(group: FormGroup) {
     const password = group.get('password');
