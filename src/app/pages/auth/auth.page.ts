@@ -49,7 +49,13 @@ export class AuthPage {
 
       }).catch(error => {
 
-        console.log(error);
+        // Escribir mal el correo o la contraseña no es un fallo del programa:
+        // el aviso ya lo explica y volcar el error entero solo ensucia la
+        // consola. Lo inesperado sí se registra, que es cuando hace falta.
+        const esperados = ['auth/invalid-credential', 'auth/wrong-password',
+          'auth/user-not-found', 'auth/invalid-email', 'auth/missing-password'];
+        if (!esperados.includes(error?.code)) console.error(error);
+
         const mensaje = this.firebaseSvc.translateErrorMessage(error.code);
         this.utilsSvc.presentToast({
           message: mensaje,
