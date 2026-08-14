@@ -1,4 +1,5 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { List } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
@@ -18,10 +19,11 @@ import { deleteUser } from '@angular/fire/auth';
   styleUrls: ['./profile.page.scss'],
   standalone: false
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, OnDestroy {
 
   user = {} as User;
   lists: List[] = [];
+  private sub?: Subscription;
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
@@ -36,6 +38,14 @@ export class ProfilePage implements OnInit {
   ionViewWillEnter() {
     this.getUser();
     this.getLists();
+  }
+
+  ionViewWillLeave() {
+    this.sub?.unsubscribe();
+  }
+
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
   }
 
   async getUser() {
@@ -315,10 +325,10 @@ export class ProfilePage implements OnInit {
       orderBy('dateHour', 'desc')
     ];
 
-    let sub = this.firebaseSvc.getSubcollection(path, query).subscribe({
+    this.sub?.unsubscribe();
+    this.sub = this.firebaseSvc.getSubcollection(path, query).subscribe({
       next: (res: List[]) => {
         this.lists = res;
-        sub.unsubscribe();
       },
       error: (err) => {
         console.error('Error al obtener listas:', err);

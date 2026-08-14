@@ -1,0 +1,172 @@
+// Todo aquí está pensado para usarse de pie, con una mano y sin fijar la vista:
+// filas altas, texto grande y objetivos de toque generosos.
+
+.compra-barra ion-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.compra-progreso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px 12px;
+  background: var(--ion-toolbar-background);
+
+  .se-progreso {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, .25);
+  }
+}
+
+.compra-progreso__texto {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ion-toolbar-color);
+  flex: none;
+}
+
+.compra {
+  --background: var(--se-fondo);
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+}
+
+.compra-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: calc(100% - 24px);
+  margin: 0 12px 8px;
+  padding: 18px 16px;
+  background: var(--se-superficie);
+  border: 1px solid var(--se-borde);
+  border-radius: var(--se-radio);
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s ease, transform .12s ease;
+
+  &:active {
+    transform: scale(.985);
+    background: var(--se-superficie-alt);
+  }
+
+  &.hecho {
+    background: transparent;
+    border-style: dashed;
+
+    .compra-item__nombre {
+      color: var(--se-texto-suave);
+      text-decoration: line-through;
+    }
+
+    .compra-item__marca {
+      color: var(--ion-color-success);
+    }
+  }
+}
+
+.compra-item__marca {
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--se-gris-400);
+
+  ion-icon {
+    font-size: 28px;
+  }
+}
+
+.compra-item__nombre {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--se-texto);
+}
+
+.compra-item__cantidad {
+  display: inline-block;
+  margin-inline-start: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--se-superficie-alt);
+  color: var(--se-texto-suave);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.compra-vacio {
+  padding: 60px 32px;
+  text-align: center;
+  color: var(--se-texto-suave);
+
+  ion-icon {
+    font-size: 58px;
+    color: var(--ion-color-success);
+  }
+
+  h3 {
+    margin: 14px 0 6px;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--se-texto);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+// ---- Añadir ----
+.compra-pie {
+  background: var(--se-superficie);
+  border-top: 1px solid var(--se-borde);
+
+  &::before {
+    display: none;
+  }
+}
+
+.compra-añadir {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+
+  ion-input {
+    --background: var(--se-superficie-alt);
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --color: var(--se-texto);
+    --placeholder-color: var(--se-texto-suave);
+    border-radius: var(--se-radio);
+    font-size: 16px; // 16px evita que iOS haga zoom al enfocar
+    min-height: 46px;
+  }
+
+  ion-button {
+    --color: var(--ion-color-primary);
+    height: 46px;
+
+    ion-icon {
+      font-size: 26px;
+    }
+  }
+
+  // Mientras escucha, el micro late para que se note que está grabando
+  .escuchando {
+    --color: var(--ion-color-danger);
+    animation: latido 1.1s ease-in-out infinite;
+  }
+}
+
+@keyframes latido {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}

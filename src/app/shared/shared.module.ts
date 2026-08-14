@@ -11,6 +11,7 @@ import { EditProfileComponent } from './components/edit-profile/edit-profile.com
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { TwoFactorComponent } from './components/two-factor/two-factor.component';
 import { VerifyCodeComponent } from './components/verify-code/verify-code.component';
+import { ShoppingModeComponent } from './components/shopping-mode/shopping-mode.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { VerifyCodeComponent } from './components/verify-code/verify-code.compon
     CustomInputListComponent,
     ChangePasswordComponent,
     TwoFactorComponent,
-    VerifyCodeComponent
+    VerifyCodeComponent,
+    ShoppingModeComponent
   ],
   exports: [
     HeaderComponent,
@@ -34,6 +36,7 @@ import { VerifyCodeComponent } from './components/verify-code/verify-code.compon
     ChangePasswordComponent,
     TwoFactorComponent,
     VerifyCodeComponent,
+    ShoppingModeComponent,
     ReactiveFormsModule
   ],
   imports: [

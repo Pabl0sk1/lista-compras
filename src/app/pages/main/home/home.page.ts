@@ -1,9 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { List, ListStatus } from 'src/app/models/list.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { AddUpdateListComponent } from 'src/app/shared/components/add-update-list/add-update-list.component';
+import { ShoppingModeComponent } from 'src/app/shared/components/shopping-mode/shopping-mode.component';
 import { Timestamp } from '@angular/fire/firestore';
 import { orderBy } from '@angular/fire/firestore';
 
@@ -13,7 +15,7 @@ import { orderBy } from '@angular/fire/firestore';
   styleUrls: ['./home.page.scss'],
   standalone: false
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
 
   firebaseSvc = inject(FirebaseService);
   utilsSvc = inject(UtilsService);
@@ -21,6 +23,7 @@ export class HomePage implements OnInit {
   constructor() { }
 
   lists: List[] = [];
+  private sub?: Subscription;
   loading: boolean = false;
 
   user = {} as User;
@@ -31,6 +34,15 @@ export class HomePage implements OnInit {
   ionViewWillEnter() {
     this.getUser();
     this.getLists();
+  }
+
+  // Al salir se corta la escucha: si no, cada entrada abriria una nueva
+  ionViewWillLeave() {
+    this.sub?.unsubscribe();
+  }
+
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
   }
 
   async getUser() {
@@ -114,10 +126,8 @@ export class HomePage implements OnInit {
   }
 
   doRefresh(event: { target: { complete: () => void; }; }) {
-    setTimeout(() => {
-      this.getLists();
-      event.target.complete();
-    }, 1000);
+    // Los datos ya llegan solos; el gesto se mantiene porque la gente lo espera
+    setTimeout(() => event.target.complete(), 600);
   }
 
   formatDate(dateHour: any): string {
@@ -179,6 +189,7 @@ export class HomePage implements OnInit {
       cssClass: 'custom-sheet',
       mode: 'ios',
       buttons: [
+        { text: 'Modo compra', icon: 'basket-outline', handler: () => this.modoCompra(list) },
         { text: 'Repetir lista', icon: 'copy-outline', handler: () => this.duplicarLista(list) },
         { text: 'Compartir', icon: 'share-outline', handler: () => this.compartirLista(list) },
         { text: 'Eliminar', icon: 'trash-outline', role: 'destructive', handler: () => this.confirmDeleteList(list) },
@@ -299,25 +310,62 @@ export class HomePage implements OnInit {
       orderBy('dateHour', 'desc')
     ];
 
-    let sub = this.firebaseSvc.getSubcollection(path, query).subscribe({
+    // Suscripción viva: antes se cortaba tras la primera lectura, así que un
+    // cambio hecho en otro dispositivo (o en otra pestaña) no llegaba hasta
+    // recargar. Se cierra al salir de la página, en ionViewWillLeave.
+    this.sub?.unsubscribe();
+    this.sub = this.firebaseSvc.getSubcollection(path, query).subscribe({
       next: (res: List[]) => {
         this.lists = this.ordenarPorUrgencia(res);
         this.loading = false;
-        sub.unsubscribe();
       },
       error: (err) => {
+        this.loading = false;
         console.error('Error al obtener listas:', err);
       }
     });
   }
 
   async addOrUpdateList(list?: List) {
-    let res = await this.utilsSvc.presentModal({
+    // La lista llega ya en tiempo real, así que no hace falta recargar al cerrar
+    await this.utilsSvc.presentModal({
       component: AddUpdateListComponent,
-      componentProps: { list },
+      componentProps: { list, sugerencias: this.itemsFrecuentes() },
       cssClass: 'add-update-modal'
-    })
-    if (res) this.getLists();
+    });
+  }
+
+  /** Pantalla a pantalla completa pensada para usar dentro del supermercado */
+  async modoCompra(list: List) {
+    await this.utilsSvc.presentModal({
+      component: ShoppingModeComponent,
+      componentProps: { list },
+      cssClass: 'modo-compra-modal'
+    });
+  }
+
+  /**
+   * Lo que más compra el usuario, sacado de sus propias listas. No hace falta
+   * guardar nada aparte: las listas ya están cargadas y así la sugerencia
+   * siempre refleja la realidad.
+   */
+  itemsFrecuentes(): string[] {
+    const cuenta = new Map<string, { nombre: string, veces: number }>();
+
+    for (const lista of this.lists) {
+      for (const item of lista.items ?? []) {
+        const clave = item.name?.trim().toLowerCase();
+        if (!clave) continue;
+        const previo = cuenta.get(clave);
+        if (previo) previo.veces++;
+        else cuenta.set(clave, { nombre: item.name.trim(), veces: 1 });
+      }
+    }
+
+    return [...cuenta.values()]
+      .sort((a, b) => b.veces - a.veces)
+      .slice(0, 12)
+      .map(x => x.nombre);
   }
 
   deleteList(list: List) {

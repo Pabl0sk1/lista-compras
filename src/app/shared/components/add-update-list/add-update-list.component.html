@@ -34,6 +34,26 @@
       </div>
     </div>
 
+    <!-- Añadir rápido: escribir y Enter, sin abrir diálogos. Si se pega texto
+         con varias líneas, se crea un item por línea. -->
+    <div class="añadir-rapido">
+      <ion-input placeholder="Añadir item y pulsar Enter" [(ngModel)]="nuevoItem" (keyup.enter)="agregarRapido()"
+        aria-label="Añadir item"></ion-input>
+      <ion-button fill="clear" shape="round" [disabled]="!nuevoItem.trim()" (click)="agregarRapido()">
+        <ion-icon slot="icon-only" name="add-circle" aria-label="Añadir"></ion-icon>
+      </ion-button>
+    </div>
+
+    <!-- Lo que sueles comprar, sacado de tus propias listas -->
+    <div class="sugerencias" *ngIf="sugerenciasVisibles.length">
+      <span class="sugerencias__titulo">Sueles comprar</span>
+      <div class="sugerencias__lista">
+        <button type="button" class="sugerencia" *ngFor="let s of sugerenciasVisibles" (click)="agregarRapido(s)">
+          <ion-icon name="add" aria-hidden="true"></ion-icon>{{s}}
+        </button>
+      </div>
+    </div>
+
     <!-- Items -->
     <ion-reorder-group class="items-lista" [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
       <ion-item class="item-fila" lines="none" *ngFor="let item of tempItems; index as i">

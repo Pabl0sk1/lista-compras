@@ -513,3 +513,10 @@ ion-tab-button {
     margin-top: 3px;
   }
 }
+
+// El modo compra ocupa toda la pantalla: se usa de pie y en movimiento
+.modo-compra-modal {
+  --height: 100%;
+  --width: 100%;
+  --border-radius: 0;
+}

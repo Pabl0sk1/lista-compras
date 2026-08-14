@@ -18,8 +18,33 @@ export class AddUpdateListComponent implements OnInit {
   utilsSvc = inject(UtilsService);
 
   @Input() list: List;
+  /** Lo que el usuario suele comprar, calculado en la pantalla de inicio */
+  @Input() sugerencias: string[] = [];
 
   tempItems: Item[] = [];
+  nuevoItem = '';
+
+  /** Se ocultan las que ya están en la lista: sugerir un duplicado no aporta */
+  get sugerenciasVisibles(): string[] {
+    const puestos = new Set(this.tempItems.map(i => i.name.trim().toLowerCase()));
+    return this.sugerencias.filter(s => !puestos.has(s.trim().toLowerCase())).slice(0, 8);
+  }
+
+  /**
+   * Añadir sin abrir diálogo. Pegar varias líneas crea un item por línea, que
+   * es como la gente trae la lista desde WhatsApp o desde una nota.
+   */
+  agregarRapido(texto?: string) {
+    const entrada = (texto ?? this.nuevoItem).trim();
+    if (!entrada) return;
+
+    const nombres = entrada.split(/\r?\n/).map(t => t.trim()).filter(Boolean);
+    for (const nombre of nombres) {
+      this.tempItems.unshift({ name: nombre.slice(0, 120), completed: false });
+    }
+
+    this.nuevoItem = '';
+  }
 
   form = new FormGroup({
     id: new FormControl(''),

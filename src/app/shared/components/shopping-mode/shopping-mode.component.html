@@ -1,0 +1,64 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="se-toolbar compra-barra">
+    <ion-buttons slot="start">
+      <ion-button shape="round" (click)="terminar()">
+        <ion-icon slot="icon-only" name="chevron-down" aria-label="Salir del modo compra"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title>{{list.title}}</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button shape="round" (click)="soloPendientes = !soloPendientes">
+        <ion-icon slot="icon-only" [name]="soloPendientes ? 'eye-outline' : 'eye-off-outline'"
+          [attr.aria-label]="soloPendientes ? 'Ver también lo comprado' : 'Ver solo lo pendiente'"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <div class="compra-progreso">
+    <div class="se-progreso" [class.completo]="progreso === 100">
+      <span [style.width.%]="progreso"></span>
+    </div>
+    <span class="compra-progreso__texto">
+      {{pendientes ? (pendientes === 1 ? 'Queda 1 item' : 'Quedan ' + pendientes + ' items') : '¡Todo listo!'}}
+    </span>
+  </div>
+</ion-header>
+
+<ion-content class="compra">
+  <!-- Un toque en toda la fila: se compra con una mano y sin apuntar fino -->
+  <button class="compra-item" type="button" *ngFor="let item of visibles" [class.hecho]="item.completed"
+    (click)="alternar(item)">
+    <span class="compra-item__marca">
+      <ion-icon [name]="item.completed ? 'checkmark-circle' : 'ellipse-outline'" aria-hidden="true"></ion-icon>
+    </span>
+    <span class="compra-item__nombre">
+      {{item.name}}
+      <span class="compra-item__cantidad" *ngIf="item.quantity && item.quantity > 1">×{{item.quantity}}</span>
+    </span>
+  </button>
+
+  <div class="compra-vacio" *ngIf="!visibles.length">
+    <ion-icon [name]="items.length ? 'checkmark-done-circle-outline' : 'basket-outline'"></ion-icon>
+    <h3>{{items.length ? 'Todo comprado' : 'La lista está vacía'}}</h3>
+    <p *ngIf="items.length">Toca el ojo de arriba para volver a ver lo comprado.</p>
+  </div>
+</ion-content>
+
+<ion-footer class="compra-pie">
+  <div class="compra-añadir">
+    <ion-input placeholder="Añadir algo más…" [(ngModel)]="nuevo" (keyup.enter)="agregar()"
+      aria-label="Añadir item"></ion-input>
+
+    <ion-button fill="clear" shape="round" *ngIf="dictadoSvc.disponible" (click)="dictar()"
+      [class.escuchando]="dictadoSvc.escuchando">
+      <ion-icon slot="icon-only" [name]="dictadoSvc.escuchando ? 'mic' : 'mic-outline'"
+        aria-label="Dictar por voz"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="clear" shape="round" [disabled]="!nuevo.trim()" (click)="agregar()">
+      <ion-icon slot="icon-only" name="add-circle" aria-label="Añadir"></ion-icon>
+    </ion-button>
+  </div>
+</ion-footer>
