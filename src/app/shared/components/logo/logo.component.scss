@@ -8,15 +8,24 @@
   color: inherit;
 }
 
+// Baldosa blanca con el carrito: el mismo recurso que usa el icono de la app
 .se-logo__marca {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: var(--marca, 72px);
   height: var(--marca, 72px);
   flex: none;
-}
+  background: #fff;
+  border-radius: calc(var(--marca, 72px) * 0.22);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 
-// El check es el único acento de color de la marca
-.se-logo__check {
-  stroke: var(--logo-accent);
+  img {
+    width: 84%;
+    height: 84%;
+    object-fit: contain;
+    display: block;
+  }
 }
 
 .se-logo__nombre {
@@ -25,7 +34,9 @@
   font-weight: 800;
   letter-spacing: -0.025em;
   line-height: 1.1;
+  white-space: nowrap;
 
+  // "Easy" lleva el verde de la marca
   span {
     color: var(--logo-accent);
   }
@@ -41,18 +52,18 @@
 // ---- Tamaños ----
 // Horizontal y compacto: pensado para caber en una barra de cabecera
 .se-logo--sm {
-  --marca: 28px;
+  --marca: 30px;
   --nombre: 18px;
   flex-direction: row;
   gap: 9px;
 }
 
 .se-logo--md {
-  --marca: 72px;
+  --marca: 84px;
   --nombre: 30px;
 }
 
 .se-logo--lg {
-  --marca: 104px;
+  --marca: 120px;
   --nombre: 38px;
 }
